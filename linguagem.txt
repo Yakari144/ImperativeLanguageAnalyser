@@ -1,0 +1,68 @@
+/* variavel sem atribuicao */
+int variavel;
+
+/* variavel com atribuicao de inteiro */
+bool vAr2 = 10;
+
+/* variavel com atribuicao de bool */
+bool var = True;
+
+/* variavel com atribuicao de string */
+string v4r3 = "texto";
+
+/* variavel com atribuicao de array com [int, str, tuplo, lista, array, bool, bool] */
+array variav3l = [1,"texto",(a,b),a->b,[],True,False];
+
+/* variavel com atribuicao de tuplo com (int, str, tuplo, lista, array, bool, bool) */
+tuplo variavel = (1,"texto",(a,b),a->b,[],True,False);
+
+/* variavel com atribuicao de lista com int -> str */
+lista variavel = 1->"texto";
+
+/* funcao com retorno */
+def int funcao(string par1,tuplo par2){
+    int variavel;
+    string v4r3 = "texto";
+    def string func4o2(){
+        /* funcao sem retorno */
+    }
+    devolve variavel;
+    devolve True;
+}
+
+/* atribuicao */
+palavra = ("tuplo",4);
+
+/* leitura */
+ler(ficheiro.txt,var);
+
+/* escrita */
+escrever(ficheiro,var);
+
+/* selecao if */
+se 1 == 1 {
+    def bool f( bool a){
+        devolve "";
+    }
+}
+
+/* selecao caso */
+caso var "texto" : {
+    tuplo a = 14 % 2;
+}
+1 : {
+    /* comentario */
+}end
+
+/* repeticao enq */
+enquanto 1 >= 1 
+fazer 
+    int a = 1 -17;
+    tuplo eg = (e,g); 
+end
+
+/* repeticao repetir */
+repetir a = a.snoc; ate !v end
+
+/* repeticao para */
+para [1,14] fazer a = palavra.id; end
