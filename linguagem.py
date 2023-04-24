@@ -1,4 +1,4 @@
-from lark import Lark
+from lark import Lark,Token,Tree
 from lark.visitors import Interpreter
 from lark import Discard
 
@@ -121,35 +121,79 @@ STR: /"(\\\"|[^"])*"/
 
 # definir o transformer
 class MyInterpreter(Interpreter):
+    def funcAct(self):
+        if len(self.funcStack) > 0:
+            return self.funcStack[-1]
+        else:
+            return None
+    
+    def pushFunc(self,func):
+        self.funcStack.append(func)
+    
+    def popFunc(self):
+        self.funcStack.pop()
+
+    def inFuncao(self):
+        return self.funcAct() != None
+
     def __init__(self):
         self.variaveis = {}
-        self.inFuncao = False
+        # create a stack to store the current function
+        self.funcStack = []
 
     def start(self,tree):
-        pass
+        self.variaveis['GLOBAL'] = []
+        self.visit_children(tree)
+        print("Variaveis:")
+        for x in self.variaveis.keys():
+            print("\t"+x)
+            for y in self.variaveis[x]:
+                print("\t\t"+y['nome']+" : "+y['tipo'])
 
     def componente(self,tree):
-        pass
-
+        self.visit_children(tree)
+        
     def declaracao(self,tree):
-        #print("Entrei na Raiz, vou visitar os Elementos")
-        for e in tree.children:
-            r = self.visit(e)
+        for elemento in tree.children:
+            if (type(elemento)==Tree):
+                if( elemento.data == 'tipo'):
+                    t = self.visit(elemento)
+            else:
+                if (elemento.type=='ID'):
+                    id = elemento.value
         #print("Elementos visitados, vou regressar à main()")
-        if self.inFuncao:
-            pass
+        if id not in [x['nome'] for x in self.variaveis['GLOBAL']]:
+            if self.inFuncao():
+                if self.funcAct() not in self.variaveis.keys():
+                    self.variaveis[self.funcAct()] = []
+                if id not in [x['nome'] for x in self.variaveis[self.funcAct()]]:
+                    self.variaveis[self.funcAct()].append({'nome':id,'tipo':t,'usada':False})
+                else:
+                    print("Variavel "+id+" já declarada")
+            else:
+                self.variaveis['GLOBAL'].append({'nome':id,'tipo':t,'usada':False})
+        else:
+            print("Variavel "+id+" já declarada")
+            return
 
     def funcao(self,tree):
-        pass
-
+        for elemento in tree.children:
+            if (type(elemento)==Tree):
+                self.visit(elemento)
+            else:
+                if (elemento.type=='ID'):
+                    self.pushFunc(elemento.value)
+        self.popFunc()
+    
     def instrucao(self,tree):
-        pass
+        self.visit_children(tree)
 
     def tipo(self,tree):
-        pass
+        for elemento in tree.children:
+            return elemento.value
 
     def exp(self,tree):
-        pass
+        return self.visit_children(tree)
 
     def op(self,tree):
         pass
@@ -158,16 +202,49 @@ class MyInterpreter(Interpreter):
         pass
 
     def params(self,tree):
-        pass
+        return self.visit_children(tree)
 
     def param(self,tree):
-        pass
+        for elemento in tree.children:
+            if (type(elemento)==Tree):
+                if( elemento.data == 'tipo'):
+                    t = self.visit(elemento)
+            else:
+                if (elemento.type=='ID'):
+                    id = elemento.value
+        #print("Elementos visitados, vou regressar à main()")
+        if id not in [x['nome'] for x in self.variaveis['GLOBAL']]:
+            if self.inFuncao():
+                if self.funcAct() not in self.variaveis.keys():
+                    self.variaveis[self.funcAct()] = []
+                if id not in [x['nome'] for x in self.variaveis[self.funcAct()]]:
+                    self.variaveis[self.funcAct()].append({'nome':id,'tipo':t,'usada':False})
+                else:
+                    print("Variavel "+id+" já declarada")
+            else:
+                self.variaveis['GLOBAL'].append({'nome':id,'tipo':t,'usada':False})
+        else:
+            print("Variavel "+id+" já declarada")
+            return
 
-    def corpo(self,tree):
-        pass
+    def corpofunc(self,tree):
+        self.visit_children(tree)
 
     def atribuicao(self,tree):
-        pass
+        for elemento in tree.children:
+            if (type(elemento)==Tree):
+                atr = self.visit(elemento)
+            else:
+                if (elemento.type=='ID'):
+                    id = elemento.value
+        if id not in [x['nome'] for x in self.variaveis['GLOBAL']]:
+            if self.inFuncao():
+                if self.funcAct() not in self.variaveis.keys():
+                    print("Variavel "+id+" não declarada")
+                elif id not in [x['nome'] for x in self.variaveis[self.funcAct()]]:
+                    print("Variavel "+id+" não declarada")
+            else:
+                print("Variavel "+id+" não declarada")
 
     def leitura(self,tree):
         pass
@@ -200,7 +277,7 @@ class MyInterpreter(Interpreter):
         pass
 
     def elemcomp(self,tree):
-        pass
+        return self.visit_children(tree)
 
     def array(self,tree):
         pass

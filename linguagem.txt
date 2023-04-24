@@ -1,5 +1,5 @@
 /* variavel sem atribuicao */
-int variavel;
+int varInt;
 
 /* variavel com atribuicao de inteiro */
 bool vAr2 = 10;
@@ -17,15 +17,17 @@ array variav3l = [1,"texto",(a,b),a->b,[],True,False];
 tuplo variavel = (1,"texto",(a,b),a->b,[],True,False);
 
 /* variavel com atribuicao de lista com int -> str */
-lista variavel = 1->"texto";
+lista variavel2 = 1->"texto";
 
 /* funcao com retorno */
 def int funcao(string par1,tuplo par2){
-    int variavel;
-    string v4r3 = "texto";
-    def string func4o2(){
+    int funcV;
+    string funcV2 = "texto";
+    def string func4o2(int paulo){
         /* funcao sem retorno */
+        paulo = 1;
     }
+    funcV = [];
     devolve variavel;
     devolve True;
 }
