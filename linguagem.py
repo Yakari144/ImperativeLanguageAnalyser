@@ -140,6 +140,7 @@ class MyInterpreter(Interpreter):
         self.variaveis = {}
         # create a stack to store the current function
         self.funcStack = []
+        self.instructions = {}
 
     def start(self,tree):
         self.variaveis['GLOBAL'] = []
@@ -151,6 +152,9 @@ class MyInterpreter(Interpreter):
             print("\t"+x)
             for y in self.variaveis[x]:
                 print("\t\t"+y['nome']+" : "+y['tipo'])
+        
+        for x in self.instructions.keys():
+            print("Instrucao "+ x + " : " + str(self.instructions[x]))
 
     def componente(self,tree):
         self.visit_children(tree)
@@ -163,6 +167,11 @@ class MyInterpreter(Interpreter):
                 if( elemento.data == 'tipo'):
                     # obter o valor do nao terminal (return da funcao "tipo(self,tree)")
                     t = self.visit(elemento)
+                elif (elemento.data == 'exp' or elemento.data == 'elemcomp'):
+                    if 'atribuicao' not in self.instructions.keys():
+                        self.instructions['atribuicao'] = 1
+                    elif 'atribuicao' in self.instructions.keys():
+                        self.instructions['atribuicao'] += 1
             else:
                 # simbolo terminal 'ID' na gramatica
                 if (elemento.type=='ID'):
@@ -203,8 +212,14 @@ class MyInterpreter(Interpreter):
         self.popFunc()
     
     def instrucao(self,tree):
-        self.visit_children(tree)
-
+        for elemento in tree.children:
+            if (type(elemento)==Tree):
+                if elemento.data not in self.instructions.keys():
+                    self.instructions[elemento.data] = 1
+                else :
+                    self.instructions[elemento.data] += 1
+                self.visit(elemento)
+                        
     def tipo(self,tree):
         for elemento in tree.children:
             return elemento.value
@@ -273,13 +288,13 @@ class MyInterpreter(Interpreter):
         pass
 
     def selecao(self,tree):
-        pass
+        self.visit_children(tree)
 
     def repeticao(self,tree):
-        pass
-
+        self.visit_children(tree)
+        
     def retorno(self,tree):
-        pass
+        self.visit_children(tree)
 
     def comp(self,tree):
         pass

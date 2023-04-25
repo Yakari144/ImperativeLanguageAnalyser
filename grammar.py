@@ -3,7 +3,7 @@ r'''
 //Regras Sintaticas
 start: componente*
 componente: declaracao | funcao | COMENTARIO | instrucao 
-declaracao: tipo ID ( "=" (elemcomp|exp) )? PVIR
+declaracao: tipo ID ( "=" (elemcomp|exp) )? PVIR    
 funcao: DEF tipo ID "(" params? ")" corpofunc
 instrucao : atribuicao PVIR
         | leitura PVIR

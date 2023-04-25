@@ -41,6 +41,8 @@ ler(ficheiro.txt,var);
 /* escrita */
 escrever(ficheiro,var);
 
+int teste;
+
 /* selecao if */
 se 1 == 1 {
     def bool f( bool a){
