@@ -140,6 +140,7 @@ class MyInterpreter(Interpreter):
         self.variaveis = {}
         # create a stack to store the current function
         self.funcStack = []
+        self.instructions = {}
 
     def start(self,tree):
         self.variaveis['GLOBAL'] = []
@@ -149,6 +150,9 @@ class MyInterpreter(Interpreter):
             print("\t"+x)
             for y in self.variaveis[x]:
                 print("\t\t"+y['nome']+" : "+y['tipo'])
+        
+        for x in self.instructions.keys():
+            print("Instrucao "+ x + " : " + str(self.instructions[x]))
 
     def componente(self,tree):
         self.visit_children(tree)
@@ -158,9 +162,15 @@ class MyInterpreter(Interpreter):
             if (type(elemento)==Tree):
                 if( elemento.data == 'tipo'):
                     t = self.visit(elemento)
+                elif (elemento.data == 'exp' or elemento.data == 'elemcomp'):
+                    if 'atribuicao' not in self.instructions.keys():
+                        self.instructions['atribuicao'] = 1
+                    elif 'atribuicao' in self.instructions.keys():
+                        self.instructions['atribuicao'] += 1
             else:
                 if (elemento.type=='ID'):
                     id = elemento.value
+                
         #print("Elementos visitados, vou regressar à main()")
         if id not in [x['nome'] for x in self.variaveis['GLOBAL']]:
             if self.inFuncao():
@@ -186,8 +196,36 @@ class MyInterpreter(Interpreter):
         self.popFunc()
     
     def instrucao(self,tree):
-        self.visit_children(tree)
-
+        for elemento in tree.children:
+            if (type(elemento)==Tree):
+                if (elemento.data == 'atribuicao'):
+                    if 'atribuicao' not in self.instructions.keys():
+                        self.instructions['atribuicao'] = 1
+                    else :
+                        self.instructions['atribuicao'] += 1
+                elif (elemento.data == 'leitura'):
+                    if 'leitura' not in self.instructions.keys():
+                        self.instructions['leitura'] = 1
+                    else :
+                        self.instructions['leitura'] += 1
+                elif (elemento.data == 'escrita'):
+                    if 'escrita' not in self.instructions.keys():
+                        self.instructions['escrita'] = 1
+                    else :
+                        self.instructions['escrita'] += 1
+                elif (elemento.data == 'selecao'):
+                    if 'selecao' not in self.instructions.keys():
+                        self.instructions['selecao'] = 1
+                    else :
+                        self.instructions['selecao'] += 1
+                elif (elemento.data == 'repeticao'):
+                    if 'repeticao' not in self.instructions.keys():
+                        self.instructions['repeticao'] = 1
+                    else :
+                        self.instructions['repeticao'] += 1
+                
+                self.visit(elemento)
+                        
     def tipo(self,tree):
         for elemento in tree.children:
             return elemento.value
@@ -256,13 +294,13 @@ class MyInterpreter(Interpreter):
         pass
 
     def selecao(self,tree):
-        pass
+        self.visit_children(tree)
 
     def repeticao(self,tree):
-        pass
-
+        self.visit_children(tree)
+        
     def retorno(self,tree):
-        pass
+        self.visit_children(tree)
 
     def comp(self,tree):
         pass
