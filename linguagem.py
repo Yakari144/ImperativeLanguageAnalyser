@@ -143,7 +143,9 @@ class MyInterpreter(Interpreter):
 
     def start(self,tree):
         self.variaveis['GLOBAL'] = []
+        # inicio do programa
         self.visit_children(tree)
+        # fim do programa
         print("Variaveis:")
         for x in self.variaveis.keys():
             print("\t"+x)
@@ -155,23 +157,38 @@ class MyInterpreter(Interpreter):
         
     def declaracao(self,tree):
         for elemento in tree.children:
+            # simbolo nao terminal
             if (type(elemento)==Tree):
+                # nao terminal 'tipo' na gramatica
                 if( elemento.data == 'tipo'):
+                    # obter o valor do nao terminal (return da funcao "tipo(self,tree)")
                     t = self.visit(elemento)
             else:
+                # simbolo terminal 'ID' na gramatica
                 if (elemento.type=='ID'):
+                    # obter o valor do terminal
                     id = elemento.value
-        #print("Elementos visitados, vou regressar à main()")
+        # print("Elementos visitados")
+        # se nao existir a variavel na lista de variaveis globais
         if id not in [x['nome'] for x in self.variaveis['GLOBAL']]:
+            # se estivermos numa funcao
             if self.inFuncao():
+                # se a funcao nao existir na lista de variaveis
                 if self.funcAct() not in self.variaveis.keys():
+                    # criar a funcao na lista de variaveis
                     self.variaveis[self.funcAct()] = []
+                # se a variavel nao existir na lista de variaveis da funcao
                 if id not in [x['nome'] for x in self.variaveis[self.funcAct()]]:
+                    # adicionar a variavel à lista de variaveis da funcao
                     self.variaveis[self.funcAct()].append({'nome':id,'tipo':t,'usada':False})
+                # se a variavel ja existir na lista de variaveis da funcao
                 else:
                     print("Variavel "+id+" já declarada")
+            # se nao estivermos numa funcao
             else:
+                # adicionar a variavel à lista de variaveis globais
                 self.variaveis['GLOBAL'].append({'nome':id,'tipo':t,'usada':False})
+        # se a variavel ja existir na lista de variaveis globais
         else:
             print("Variavel "+id+" já declarada")
             return
