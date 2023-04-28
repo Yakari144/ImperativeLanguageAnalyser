@@ -10,6 +10,9 @@ bool var = True;
 /* variavel com atribuicao de string */
 string v4r3 = "texto";
 
+int a;
+int b;
+
 /* variavel com atribuicao de array com [int, str, tuplo, lista, array, bool, bool] */
 array variav3l = [1,"texto",(a,b),a->b,[],True,False];
 
@@ -45,14 +48,14 @@ int teste;
 
 /* selecao if */
 se 1 == 1 {
-    def bool f( bool a){
+    def bool f( bool tentativa){
         devolve "";
     }
 }
 
 /* selecao caso */
 caso var "texto" : {
-    tuplo a = 14 % 2;
+    tuplo k = 14 % 2;
 }
 1 : {
     /* comentario */
@@ -61,7 +64,7 @@ caso var "texto" : {
 /* repeticao enq */
 enquanto 1 >= 1 
 fazer 
-    int a = 1 -17;
+    int e = 1 -17;
     tuplo eg = (e,g); 
 end
 

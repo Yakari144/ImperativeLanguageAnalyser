@@ -1,10 +1,12 @@
 
 r'''
 //Regras Sintaticas
-start: componente*
+start: componentes
+componentes: (componente|deffuncao)*
 componente: declaracao | funcao | COMENTARIO | instrucao 
-declaracao: tipo ID ( "=" (elemcomp|exp) )? PVIR    
-funcao: DEF tipo ID "(" params? ")" corpofunc
+declaracao: tipo ID ( "=" ecomp )? PVIR    
+deffuncao: DEF tipo ID "(" params? ")" corpofunc
+funcao: ID "(" (ecomp("," ecomp)*)? ")"
 instrucao : atribuicao PVIR
         | leitura PVIR
         | escrita PVIR
@@ -16,6 +18,7 @@ tipo : INT
     | ARRAY
     | TUPLO
     | LISTA
+ecomp: exp|elemcomp
 exp: NUM op NUM
     | ID "[" NUM "]"
     | ID "." oplist
@@ -33,8 +36,8 @@ oplist : CONS
     | TAIL
 params: param (VIR param)*
 param: tipo ID
-corpofunc: "{" (componente|retorno)* "}"
-atribuicao: ID "=" (exp|elemcomp)
+corpofunc: "{" (componentes|retorno)* "}"
+atribuicao: ID "=" (ecomp)
 leitura: LER "(" ficheiro "," ID ")"
 escrita: ESCREVER "(" ficheiro "," ID ")"
 ficheiro: ID ("." ID)?
@@ -57,6 +60,7 @@ interv: "[" NUM "," NUM "]"
 elemcomp: ID
     | NUM
     | STR
+    | funcao
     | array
     | tuplo
     | lista
