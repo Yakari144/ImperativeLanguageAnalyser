@@ -48,9 +48,7 @@ int teste;
 
 /* selecao if */
 se 1 == 1 {
-    def bool f( bool tentativa){
-        devolve "";
-    }
+    f(queCenaMeu);
 }
 
 /* selecao caso */

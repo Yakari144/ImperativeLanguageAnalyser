@@ -5,21 +5,25 @@ from lark import Discard
 ## Primeiro precisamos da GIC
 grammar = r'''
 //Regras Sintaticas
-start: componente*
-componente: declaracao | deffuncao | COMENTARIO | instrucao 
-declaracao: tipo ID ( "=" (elemcomp|exp) )? PVIR
+start: componentes
+componentes: (componente|deffuncao)*
+componente: declaracao | COMENTARIO | instrucao 
+declaracao: tipo ID ( "=" ecomp )? PVIR    
 deffuncao: DEF tipo ID "(" params? ")" corpofunc
+funcao: ID "(" (ecomp("," ecomp)*)? ")"
 instrucao : atribuicao PVIR
         | leitura PVIR
         | escrita PVIR
         | selecao
         | repeticao
+        | funcao PVIR
 tipo : INT
     | BOOLEAN
     | STRING
     | ARRAY
     | TUPLO
     | LISTA
+ecomp: exp|elemcomp
 exp: NUM op NUM
     | ID "[" NUM "]"
     | ID "." oplist
@@ -37,8 +41,8 @@ oplist : CONS
     | TAIL
 params: param (VIR param)*
 param: tipo ID
-corpofunc: "{" (componente|retorno)* "}"
-atribuicao: ID "=" (exp|elemcomp)
+corpofunc: "{" (componentes|deffuncao|retorno)* "}"
+atribuicao: ID "=" (ecomp)
 leitura: LER "(" ficheiro "," ID ")"
 escrita: ESCREVER "(" ficheiro "," ID ")"
 ficheiro: ID ("." ID)?
@@ -61,6 +65,7 @@ interv: "[" NUM "," NUM "]"
 elemcomp: ID
     | NUM
     | STR
+    | funcao
     | array
     | tuplo
     | lista
@@ -118,6 +123,7 @@ STR: /"(\\\"|[^"])*"/
 %import common.WS
 %ignore WS
 '''
+
 
 # definir o transformer
 class MyInterpreter(Interpreter):
@@ -221,6 +227,9 @@ class MyInterpreter(Interpreter):
     def tipo(self,tree):
         for elemento in tree.children:
             return elemento.value
+
+    def ecomp(self,tree):
+        self.visit_children(tree)
 
     def exp(self,tree):
         i = 0
@@ -372,6 +381,9 @@ class MyInterpreter(Interpreter):
                             for x in self.variaveis['GLOBAL']:
                                 if x['nome'] == id:
                                     x['usada'] = True
+
+    def funcao(self,tree):
+        self.visit_children(tree)
 
     def array(self,tree):
         self.visit_children(tree)

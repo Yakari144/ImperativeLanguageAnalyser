@@ -3,7 +3,7 @@ r'''
 //Regras Sintaticas
 start: componentes
 componentes: (componente|deffuncao)*
-componente: declaracao | funcao | COMENTARIO | instrucao 
+componente: declaracao | COMENTARIO | instrucao 
 declaracao: tipo ID ( "=" ecomp )? PVIR    
 deffuncao: DEF tipo ID "(" params? ")" corpofunc
 funcao: ID "(" (ecomp("," ecomp)*)? ")"
@@ -12,6 +12,7 @@ instrucao : atribuicao PVIR
         | escrita PVIR
         | selecao
         | repeticao
+        | funcao PVIR
 tipo : INT
     | BOOLEAN
     | STRING
@@ -36,7 +37,7 @@ oplist : CONS
     | TAIL
 params: param (VIR param)*
 param: tipo ID
-corpofunc: "{" (componentes|retorno)* "}"
+corpofunc: "{" (componentes|deffuncao|retorno)* "}"
 atribuicao: ID "=" (ecomp)
 leitura: LER "(" ficheiro "," ID ")"
 escrita: ESCREVER "(" ficheiro "," ID ")"
