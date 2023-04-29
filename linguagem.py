@@ -1,8 +1,8 @@
-from lark import Lark,Token,Tree
+from lark import Lark, Token, Tree
 from lark.visitors import Interpreter
 from lark import Discard
 
-## Primeiro precisamos da GIC
+# Primeiro precisamos da GIC
 grammar = r'''
 //Regras Sintaticas
 start: componentes
@@ -73,10 +73,12 @@ elemcomp: ID
 array : "[" (elemcomp (VIR elemcomp)*)? "]"
 tuplo : "(" elemcomp (VIR elemcomp)+ ")"
 lista : elemcomp "->" elemcomp
-bool : "True" | "False"
+bool : TRUE | FALSE
 //
 //Regras Lexicográficas
 //
+TRUE: "True"
+FALSE: "False"
 ID: "a".."z"("a".."z"|"A".."Z"|"_"|"0".."9")*
 COMENTARIO: /\/\*(.|\n)*?\*\//
 PVIR : ";"
@@ -125,16 +127,23 @@ STR: /"(\\\"|[^"])*"/
 
 
 # definir o transformer
+
+
 class MyInterpreter(Interpreter):
     def funcAct(self):
         if len(self.funcStack) > 0:
             return self.funcStack[-1]
         else:
             return None
-    
-    def pushFunc(self,func):
+
+    def pushFunc(self, func):
         self.funcStack.append(func)
-    
+
+    def getTabFunc(self):
+        # get the number of functions in the stack
+        n = len(self.funcStack)
+        return "\t" * n
+
     def popFunc(self):
         self.funcStack.pop()
 
@@ -176,31 +185,173 @@ class MyInterpreter(Interpreter):
                 s2 =  " "*(maxtipo-len(y['tipo']))
                 s = "\t\t"+y['nome']+s1+" : "+y['tipo']+s2+" : "+str(y['usada'])+" : "+str(y['atribuicao'])+" :"
                 print(s)
+    def htmlInit(self):
+        self.HTML += ''' 
+        <!DOCTYPE html>
+        <html>
+        <style>
+            .error {
+                position: relative;
+                display: inline-block;
+                border-bottom: 1px dotted black;
+                color: red;
+            }
+            
+            .code {
+                position: relative;
+                display: inline-block;
+            }
+            
+            .error .errortext {
+                visibility: hidden;
+                width: 200px;
+                background-color: #555;
+                color: #fff;
+                text-align: center;
+                border-radius: 6px;
+                padding: 5px 0;
+                position: absolute;
+                z-index: 1;
+                bottom: 125%;
+                left: 50%;
+                margin-left: -40px;
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .error .errortext::after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 20%;
+                margin-left: -5px;
+                border-width: 5px;
+                border-style: solid;
+                border-color: #555 transparent transparent transparent;
+            }
+
+            .error:hover .errortext {
+                visibility: visible;
+                opacity: 1;
+            }
+        </style>
+        <body>
+            <h2>Análise de código</h2>
+            <pre><code>
+        '''
+    
+    def htmlEnd(self):
+        self.HTML += '''
+            </code></pre>
+        </body>
+        </html>
+        '''
+    
+    def writeHTML(self):
+        f = open("output.html", "w")
+        f.write(self.HTML)
+
+    def htmlInit(self):
+        self.HTML += ''' 
+        <!DOCTYPE html>
+        <html>
+        <style>
+            .error {
+                position: relative;
+                display: inline-block;
+                border-bottom: 1px dotted black;
+                color: red;
+            }
+            
+            .code {
+                position: relative;
+                display: inline-block;
+            }
+            
+            .error .errortext {
+                visibility: hidden;
+                width: 200px;
+                background-color: #555;
+                color: #fff;
+                text-align: center;
+                border-radius: 6px;
+                padding: 5px 0;
+                position: absolute;
+                z-index: 1;
+                bottom: 125%;
+                left: 50%;
+                margin-left: -40px;
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .error .errortext::after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 20%;
+                margin-left: -5px;
+                border-width: 5px;
+                border-style: solid;
+                border-color: #555 transparent transparent transparent;
+            }
+
+            .error:hover .errortext {
+                visibility: visible;
+                opacity: 1;
+            }
+        </style>
+        <body>
+            <h2>Análise de código</h2>
+            <pre><code>
+        '''
+    
+    def htmlEnd(self):
+        self.HTML += '''
+            </code></pre>
+        </body>
+        </html>
+        '''
+    
+    def writeHTML(self):
+        f = open("output.html", "w")
+        f.write(self.HTML)
 
     def __init__(self):
         self.variaveis = {}
         # create a stack to store the current function
         self.funcStack = []
         self.instructions = {}
+        self.HTML = ""
 
-    def start(self,tree):
+    def start(self, tree):
         self.variaveis['GLOBAL'] = []
         # inicio do programa
+        self.htmlInit()
+        self.HTML += "<br>"
         self.visit_children(tree)
+        self.htmlEnd()
+        self.writeHTML()
         # fim do programa
         self.printVars()
         
         #for x in self.instructions.keys():
         #    print("Instrucao "+ x + " : " + str(self.instructions[x]))
-
-    def componentes(self,tree):
+    
+    def componentes(self, tree):
         self.visit_children(tree)
-
-    def componente(self,tree):
-        self.visit_children(tree)    
-        
-    def declaracao(self,tree):
-        atr = False
+    
+    def componente(self, tree):
+        for elemento in tree.children:
+            if(type(elemento) == Tree):
+                self.visit(elemento)
+            else:
+                if (elemento.type=='COMENTARIO'):
+                    comentario = elemento.value
+                    self.HTML += "<span class='code'> "+comentario+" </span> <br>"
+            
+    def declaracao(self, tree):
+        atr=False
         for elemento in tree.children:
             # simbolo nao terminal
             if (type(elemento)==Tree):
@@ -208,19 +359,26 @@ class MyInterpreter(Interpreter):
                 if( elemento.data == 'tipo'):
                     # obter o valor do nao terminal (return da funcao "tipo(self,tree)")
                     t = self.visit(elemento)
+                    self.HTML += "<span class='code'> "+t+" </span>"
                 else :
-                    self.visit(elemento)
                     if (elemento.data == 'ecomp'):
                         atr = True
                         if 'atribuicao' not in self.instructions.keys():
                             self.instructions['atribuicao'] = 1
                         else:
                             self.instructions['atribuicao'] += 1
+                        self.HTML += "<span class='code'> = </span>"
+                    self.visit(elemento)
             else:
                 # simbolo terminal 'ID' na gramatica
                 if (elemento.type=='ID'):
                     # obter o valor do terminal
                     id = elemento.value
+                    self.HTML += "<span class='code'> "+id+" </span>"
+                elif (elemento.type=='PVIR'):
+                    self.HTML += "<span class='code'>;</span> <br>"
+                    
+                    
         # print("Elementos visitados")
         # se a variavel esta declarada no contexto atual
         if self.checkDecl(id):
@@ -236,17 +394,32 @@ class MyInterpreter(Interpreter):
 
     def deffuncao(self,tree):
         for elemento in tree.children:
-            if (type(elemento)==Tree):
-                self.visit(elemento)
+            if (type(elemento) == Tree):
+                if (elemento.data == 'tipo'):
+                    t = self.visit(elemento)
+                    self.HTML += "<span class='code'> " + t + " </span>"
+                
+                elif (elemento.data == 'params'):
+                    t = self.visit(elemento)
+                
+                elif (elemento.data == 'corpofunc'):
+                    t = self.visit(elemento)
+                    
             else:
-                if (elemento.type=='ID'):
+                if (elemento.type == 'ID'):
                     self.pushFunc(elemento.value)
+                    t = elemento.value
+                    self.HTML += "<span class='code'> " + t + " ( </span>"
+                    
+                elif (elemento.type == 'DEF'):
+                    t = elemento.value
+                    self.HTML += "<span class='code'> " + t + " </span>"
         for var in self.variaveis[self.funcAct()]:
             if not var['usada']:
                 print("Variavel "+var['nome']+" na funcao "+self.funcAct()+" nao usada (3)")
         self.popFunc()
-    
-    def instrucao(self,tree):
+
+    def instrucao(self, tree):
         for elemento in tree.children:
             if (type(elemento)==Tree):
                 if elemento.data not in self.instructions.keys():
@@ -254,8 +427,13 @@ class MyInterpreter(Interpreter):
                 else :
                     self.instructions[elemento.data] += 1
                 self.visit(elemento)
-                        
-    def tipo(self,tree):
+            else:
+                if (elemento.type == 'PVIR'):
+                    self.HTML += "<span class='code'> ; </span> <br>"
+
+
+
+    def tipo(self, tree):
         for elemento in tree.children:
             return elemento.value
 
@@ -264,49 +442,89 @@ class MyInterpreter(Interpreter):
 
     def exp(self,tree):
         i = 0
+        firstEntry = 0
+        firstElement = ""
         for elemento in tree.children:
             if (type(elemento)==Tree):
-                self.visit(elemento)
-            else:
-                if (elemento.type=='ID'):
-                    if i > 0:
-                        continue
-                    id = elemento.value
-                    i+=1
-                    if not self.checkDecl(id):
-                        print("Variavel "+id+" não declarada (2)")
-                    else:
-                        if self.inFuncao():
-                            for x in self.variaveis[self.funcAct()]:
-                                if x['nome'] == id:
-                                    self.setVar(id,'usada',True)
-                                    if x['atribuicao'] == False:
-                                        print("Variavel "+id+" não inicializada (4)")
-                        else:
-                            for x in self.variaveis['GLOBAL']:
-                                if x['nome'] == id:
-                                    self.setVar(id,'usada',True)
-                                    if x['atribuicao'] == False:
-                                        print("Variavel "+id+" não inicializada (4)")
-
-    def op(self,tree):
-        pass
-
-    def oplist(self,tree):
-        pass
-
-    def params(self,tree):
-        return self.visit_children(tree)
-
-    def param(self,tree):
-        for elemento in tree.children:
-            if (type(elemento)==Tree):
-                if( elemento.data == 'tipo'):
+                if( elemento.data == 'op'):
+                    # obter o valor do nao terminal (return da funcao "tipo(self,tree)")
                     t = self.visit(elemento)
+                    self.HTML += "<span class='code'> "+t+" </span>"
+                elif (elemento.data == 'oplist'):
+                    t = self.visit(elemento)
+                    self.HTML += "<span class='code'> "+t+" </span>"
             else:
                 if (elemento.type=='ID'):
+                    if (firstEntry == 0):
+                        firstEntry = 1
+                        firstElement = "ID"
+                    else:
+                        firstEntry = 2
                     id = elemento.value
-        #print("Elementos visitados, vou regressar à main()")
+                    if i == 0:
+                        i+=1
+                        if not self.checkDecl(id):
+                            print("Variavel "+id+" não declarada (2)")
+                            self.HTML += "<span class='error'> "+id+"</span>"
+                        else:
+                            if self.inFuncao():
+                                for x in self.variaveis[self.funcAct()]:
+                                    if x['nome'] == id:
+                                        self.setVar(id,'usada',True)
+                                        if x['atribuicao'] == False:
+                                            print("Variavel "+id+" não inicializada (4)")
+                            else:
+                                for x in self.variaveis['GLOBAL']:
+                                    if x['nome'] == id:
+                                        self.setVar(id,'usada',True)
+                                        if x['atribuicao'] == False:
+                                            print("Variavel "+id+" não inicializada (4)")
+                            self.HTML += "<span class='code'> "+id+"</span>"
+                    else:
+                        self.HTML += "<span class='code'>."+id+"</span>"
+                elif (elemento.type == 'NUM'):
+                    if (firstEntry == 0):
+                        firstEntry = 1
+                        firstElement = "NUM"
+                        
+                    if firstElement == "NUM":
+                        num = elemento.value
+                        self.HTML += "<span class='code'> "+num+" </span>"
+                    else:
+                        num = elemento.value
+                        self.HTML += "<span class='code'>[ "+num+" ]</span>"
+
+    def op(self, tree):
+        for elemento in tree.children:
+            return elemento.value
+
+
+    def oplist(self, tree):
+        for elemento in tree.children:
+            return elemento.value
+
+
+    def params(self, tree):
+        for elemento in tree.children:
+            if (type(elemento) == Tree):
+                if (elemento.data == 'param'):
+                    self.visit(elemento)
+            else:
+                if (elemento.type == 'VIR'):
+                    self.HTML += "<span class='code'>, </span>"
+
+    def param(self, tree):
+        for elemento in tree.children:
+            if (type(elemento) == Tree):
+                if (elemento.data == 'tipo'):
+                    t = self.visit(elemento)
+                    self.HTML += "<span class='code'> " + t + " </span>"
+            else:
+                if (elemento.type == 'ID'):
+                    id = elemento.value
+                    self.HTML += "<span class='code'> " + id + " </span>"
+        # print("Elementos visitados, vou regressar à main()")
+        # print("Elementos visitados, vou regressar à main()")
         if id not in [x['nome'] for x in self.variaveis['GLOBAL']]:
             if self.inFuncao():
                 if self.funcAct() not in self.variaveis.keys():
@@ -321,16 +539,20 @@ class MyInterpreter(Interpreter):
             print("Variavel "+id+" já declarada (1)")
             return
 
-    def corpofunc(self,tree):
+
+    def corpofunc(self, tree):
+        self.HTML += "<span class='code'> ) </span> <br> <span class='code'> { </span> <br>"
         self.visit_children(tree)
 
-    def atribuicao(self,tree):
+
+    def atribuicao(self, tree):
         for elemento in tree.children:
             if (type(elemento)==Tree):
                 self.visit(elemento)
             else:
-                if (elemento.type=='ID'):
+                if (elemento.type == 'ID'):
                     id = elemento.value
+                    self.HTML += "<span class='code'> " + id + " = </span>"
         if id not in [x['nome'] for x in self.variaveis['GLOBAL']]:
             if self.inFuncao():
                 if self.funcAct() not in self.variaveis.keys():
@@ -368,7 +590,7 @@ class MyInterpreter(Interpreter):
                     else:
                         self.setVar(id,'usada',True)
 
-    def ficheiro(self,tree):
+    def ficheiro(self, tree):
         pass
 
     def selecao(self,tree):
@@ -383,10 +605,13 @@ class MyInterpreter(Interpreter):
                     else:
                         self.setVar(id,'usada',True)
 
-    def repeticao(self,tree):
+
+    def repeticao(self, tree):
         self.visit_children(tree)
-        
-    def retorno(self,tree):
+
+
+
+    def retorno(self, tree):
         self.visit_children(tree)
 
     def comp(self,tree):
@@ -401,15 +626,29 @@ class MyInterpreter(Interpreter):
                     else:
                         self.setVar(id,'usada',True)
 
-    def sinalcomp(self,tree):
+
+    def sinalcomp(self, tree):
         pass
 
     def caso(self,tree):
         self.visit_children(tree)
 
-    def interv(self,tree):
-        pass
 
+    def interv(self, tree):
+        first = True
+        self.HTML += "<span class='code'> [ </span>"
+        for elemento in tree.children:
+            if (type(elemento)==Tree):
+                self.visit(elemento)
+            else:
+                if(elemento.type=='NUM'):
+                    if first:
+                        first = False
+                    else:
+                        self.HTML += "<span class='code'>, </span>"
+                    self.HTML += "<span class='code'> " + elemento.value + " </span>"
+        self.HTML += "<span class='code'> ] </span>"
+        
     def elemcomp(self,tree):
         for elemento in tree.children:
             if (type(elemento)==Tree):
@@ -419,6 +658,7 @@ class MyInterpreter(Interpreter):
                     id = elemento.value
                     if not self.checkDecl(id):
                         print("Variavel "+id+" não declarada (2)")
+                        self.HTML += "<span class='error'> " + id + " </span>"
                     else:
                         if self.inFuncao():
                             for x in self.variaveis[self.funcAct()]:
@@ -433,24 +673,79 @@ class MyInterpreter(Interpreter):
                                     self.setVar(id,'usada',True)
                                     if x['atribuicao'] == False:
                                         print("Variavel "+id+" não inicializada (4)")
+                        self.HTML += "<span class='code'> " + id + " </span>"
+                elif (elemento.type=='NUM'):
+                    num = elemento.value
+                    self.HTML += "<span class='code'> " + num + " </span>"
+                elif (elemento.type == 'STR'):
+                    t = elemento.value
+                    self.HTML += "<span class='code'> " + t + " </span>"
+                
 
     def funcao(self,tree):
-        self.visit_children(tree)
-
+        first = True;
+        for elemento in tree.children:
+            if (type(elemento) == Tree):
+                if (first):
+                    self.visit(elemento)
+                    first = False
+                else:
+                    self.HTML += "<span class='code'>, </span>"
+                    self.visit(elemento)
+            else: 
+                if (elemento.type == 'ID'):
+                    id = elemento.value
+                    self.HTML += "<span class='code'> " + id + " ( </span>"
+        self.HTML += "<span class='code'> ) </span>" 
+        
     def array(self,tree):
-        self.visit_children(tree)
+        self.HTML += "<span class='code'> [ </span>"
+        for elemento in tree.children:
+            if (type(elemento)==Tree):
+                self.visit(elemento)
+            else :
+                if (elemento.type=='VIR'):
+                    num = elemento.value
+                    self.HTML += "<span class='code'>, </span>"
+        self.HTML += "<span class='code'> ] </span>"
+        
 
     def tuplo(self,tree):
-        self.visit_children(tree)
+        self.HTML += "<span class='code'> ( </span>"
+        for elemento in tree.children:
+            if (type(elemento)==Tree):
+                self.visit(elemento)
+            else :
+                if (elemento.type=='VIR'):
+                    num = elemento.value
+                    self.HTML += "<span class='code'>, </span>"
+        self.HTML += "<span class='code'> ) </span>"
 
     def lista(self,tree):
-        self.visit_children(tree)
+        first = True
+        for elemento in tree.children:
+            if (type(elemento)==Tree):
+                self.visit(elemento)
+                if first:
+                    self.HTML += "<span class='code'> -> </span>"
+                    first = False
 
+    def bool(self,tree):
+        for elemento in tree.children:
+            if (type(elemento)==Tree):
+                self.visit(elemento)
+            else:
+                if(elemento.type == 'TRUE'):
+                    self.HTML += "<span class='code'> true </span>"
+                elif (elemento.type == 'FALSE'):
+                    self.HTML += "<span class='code'> false </span>"
+        
 
 f = open('linguagem.txt', 'r')
 frase = f.read()
 f.close()
 
-p = Lark(grammar) 
+p = Lark(grammar)
+p = Lark(grammar)
 tree = p.parse(frase)
 data = MyInterpreter().visit(tree)

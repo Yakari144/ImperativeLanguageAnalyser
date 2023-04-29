@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<style>
+    .error {
+        position: relative;
+        display: inline-block;
+        border-bottom: 1px dotted black;
+        color: red;
+    }
+
+    .code {
+        position: relative;
+        display: inline-block;
+    }
+
+    .error .errortext {
+        visibility: hidden;
+        width: 200px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -40px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .error .errortext::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 20%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #555 transparent transparent transparent;
+    }
+
+    .error:hover .errortext {
+        visibility: visible;
+        opacity: 1;
+    }
+</style>
+
+<body>
+    <h2>An´alise de c´odigo</h2>
+    2
+    <pre><code>
+        <pre><code>
+            <p class="code">
+            int z;
+            </p>
+            <p class="code">
+                if(<div class="error">cond<span class="errortext">Vari´avel n~ao inicializada</span></div>){
+            </p>
+            <p class="code">
+                    if(<div class="error">y<span class="errortext">Vari´avel n~ao inicializada</span></div>) {
+            </p>
+            <p class="code">
+                        if(<div class="error">z<span class="errortext">Vari´avel n~ao inicializada</span></div>) {
+            </p>
+            <p class="code">
+                            z=1;k=3}
+            </p>
+            <p class="code">
+                        if(k) {
+            </p>
+            <p class="code">
+                            k=2; z=9; x=5;}
+            </p>
+            <p class="code">
+                        }
+            </p>
+            <p class="code">
+                }
+            </p>
+            <p class="code">
+            int x;
+            </p>
+            <p class="code">
+            x=3;
+            </p>
+</code></pre>
+</body>
+
+</html>

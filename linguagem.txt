@@ -1,6 +1,19 @@
 /* variavel sem atribuicao */
 int varInt;
 
+funcao (a, v);
+
+int tetris;
+
+int camelo = 2+2;
+
+int x = [2,3,4];
+
+int cavalo = x.tail;
+
+int valorTeste = tetris.value;
+
+
 /* variavel com atribuicao de inteiro */
 bool vAr2 = 10;
 
