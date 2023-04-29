@@ -69,11 +69,13 @@ elemcomp: ID
 array : "[" (elemcomp (VIR elemcomp)*)? "]"
 tuplo : "(" elemcomp (VIR elemcomp)+ ")"
 lista : elemcomp "->" elemcomp
-bool : "True" | "False"
+bool : TRUE | FALSE
 //
 //
 //Regras Lexicográficas
 //
+TRUE: "True"
+FALSE: "False"
 ID: "a".."z"("a".."z"|"A".."Z"|"_"|"0".."9")*
 COMENTARIO: /\/\*(.|\n)*?\*\//
 PVIR : ";"
