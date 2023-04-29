@@ -1,0 +1,57 @@
+ 
+        <!DOCTYPE html>
+        <html>
+        <style>
+            .error {
+                position: relative;
+                display: inline-block;
+                border-bottom: 1px dotted black;
+                color: red;
+            }
+            
+            .code {
+                position: relative;
+                display: inline-block;
+            }
+            
+            .error .errortext {
+                visibility: hidden;
+                width: 200px;
+                background-color: #555;
+                color: #fff;
+                text-align: center;
+                border-radius: 6px;
+                padding: 5px 0;
+                position: absolute;
+                z-index: 1;
+                bottom: 125%;
+                left: 50%;
+                margin-left: -40px;
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .error .errortext::after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 20%;
+                margin-left: -5px;
+                border-width: 5px;
+                border-style: solid;
+                border-color: #555 transparent transparent transparent;
+            }
+
+            .error:hover .errortext {
+                visibility: visible;
+                opacity: 1;
+            }
+        </style>
+        <body>
+            <h2>Análise de código</h2>
+            <pre><code>
+        <span class='code'> int </span><span class='code'> varInt </span> <br><span class='code'> bool </span><span class='code'> vAr2 </span> <br><span class='code'> bool </span><span class='code'> var </span> <br><span class='code'> string </span><span class='code'> v4r3 </span> <br><span class='code'> array </span><span class='code'> variav3l </span> <br><span class='code'> tuplo </span><span class='code'> variavel </span> <br><span class='code'> lista </span><span class='code'> variavel2 </span> <br><span class='code'> int </span><span class='code'> funcV </span> <br><span class='code'> string </span><span class='code'> funcV2 </span> <br><span class='code'> int </span><span class='code'> teste </span> <br><span class='code'> tuplo </span><span class='code'> a </span> <br><span class='code'> int </span><span class='code'> a </span> <br><span class='code'> tuplo </span><span class='code'> eg </span> <br>
+            </code></pre>
+        </body>
+        </html>
+        

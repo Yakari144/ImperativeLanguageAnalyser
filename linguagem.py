@@ -1,8 +1,8 @@
-from lark import Lark,Token,Tree
+from lark import Lark, Token, Tree
 from lark.visitors import Interpreter
 from lark import Discard
 
-## Primeiro precisamos da GIC
+# Primeiro precisamos da GIC
 grammar = r'''
 //Regras Sintaticas
 start: componentes
@@ -126,16 +126,19 @@ STR: /"(\\\"|[^"])*"/
 
 
 # definir o transformer
+
+
 class MyInterpreter(Interpreter):
     def funcAct(self):
         if len(self.funcStack) > 0:
             return self.funcStack[-1]
         else:
             return None
-    
-    def pushFunc(self,func):
+
+    def pushFunc(self, func):
         self.funcStack.append(func)
-    
+
+
     def popFunc(self):
         self.funcStack.pop()
 
@@ -150,16 +153,152 @@ class MyInterpreter(Interpreter):
         else:
             return False
 
+    def htmlInit(self):
+        self.HTML += ''' 
+        <!DOCTYPE html>
+        <html>
+        <style>
+            .error {
+                position: relative;
+                display: inline-block;
+                border-bottom: 1px dotted black;
+                color: red;
+            }
+            
+            .code {
+                position: relative;
+                display: inline-block;
+            }
+            
+            .error .errortext {
+                visibility: hidden;
+                width: 200px;
+                background-color: #555;
+                color: #fff;
+                text-align: center;
+                border-radius: 6px;
+                padding: 5px 0;
+                position: absolute;
+                z-index: 1;
+                bottom: 125%;
+                left: 50%;
+                margin-left: -40px;
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .error .errortext::after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 20%;
+                margin-left: -5px;
+                border-width: 5px;
+                border-style: solid;
+                border-color: #555 transparent transparent transparent;
+            }
+
+            .error:hover .errortext {
+                visibility: visible;
+                opacity: 1;
+            }
+        </style>
+        <body>
+            <h2>Análise de código</h2>
+            <pre><code>
+        '''
+    
+    def htmlEnd(self):
+        self.HTML += '''
+            </code></pre>
+        </body>
+        </html>
+        '''
+    
+    def writeHTML(self):
+        f = open("output.html", "w")
+        f.write(self.HTML)
+
+    def htmlInit(self):
+        self.HTML += ''' 
+        <!DOCTYPE html>
+        <html>
+        <style>
+            .error {
+                position: relative;
+                display: inline-block;
+                border-bottom: 1px dotted black;
+                color: red;
+            }
+            
+            .code {
+                position: relative;
+                display: inline-block;
+            }
+            
+            .error .errortext {
+                visibility: hidden;
+                width: 200px;
+                background-color: #555;
+                color: #fff;
+                text-align: center;
+                border-radius: 6px;
+                padding: 5px 0;
+                position: absolute;
+                z-index: 1;
+                bottom: 125%;
+                left: 50%;
+                margin-left: -40px;
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .error .errortext::after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 20%;
+                margin-left: -5px;
+                border-width: 5px;
+                border-style: solid;
+                border-color: #555 transparent transparent transparent;
+            }
+
+            .error:hover .errortext {
+                visibility: visible;
+                opacity: 1;
+            }
+        </style>
+        <body>
+            <h2>Análise de código</h2>
+            <pre><code>
+        '''
+    
+    def htmlEnd(self):
+        self.HTML += '''
+            </code></pre>
+        </body>
+        </html>
+        '''
+    
+    def writeHTML(self):
+        f = open("output.html", "w")
+        f.write(self.HTML)
+
     def __init__(self):
         self.variaveis = {}
         # create a stack to store the current function
         self.funcStack = []
         self.instructions = {}
+        self.HTML = ""
 
-    def start(self,tree):
+    def start(self, tree):
         self.variaveis['GLOBAL'] = []
         # inicio do programa
+        self.htmlInit()
         self.visit_children(tree)
+        self.htmlEnd()
+        self.writeHTML()
         # fim do programa
         print("Variaveis:")
         for x in self.variaveis.keys():
@@ -170,10 +309,10 @@ class MyInterpreter(Interpreter):
         #for x in self.instructions.keys():
         #    print("Instrucao "+ x + " : " + str(self.instructions[x]))
 
-    def componente(self,tree):
+    def componente(self, tree):
         self.visit_children(tree)
-        
-    def declaracao(self,tree):
+            
+    def declaracao(self, tree):
         for elemento in tree.children:
             # simbolo nao terminal
             if (type(elemento)==Tree):
@@ -193,6 +332,9 @@ class MyInterpreter(Interpreter):
                 if (elemento.type=='ID'):
                     # obter o valor do terminal
                     id = elemento.value
+                    self.HTML += "<span class='code'> "+id+" </span> <br>"
+                    
+                    
         # print("Elementos visitados")
         # se a variavel esta declarada no contexto atual
         if self.checkDecl(id):
@@ -208,14 +350,14 @@ class MyInterpreter(Interpreter):
 
     def deffuncao(self,tree):
         for elemento in tree.children:
-            if (type(elemento)==Tree):
+            if (type(elemento) == Tree):
                 self.visit(elemento)
             else:
-                if (elemento.type=='ID'):
+                if (elemento.type == 'ID'):
                     self.pushFunc(elemento.value)
         self.popFunc()
-    
-    def instrucao(self,tree):
+
+    def instrucao(self, tree):
         for elemento in tree.children:
             if (type(elemento)==Tree):
                 if elemento.data not in self.instructions.keys():
@@ -223,8 +365,10 @@ class MyInterpreter(Interpreter):
                 else :
                     self.instructions[elemento.data] += 1
                 self.visit(elemento)
-                        
-    def tipo(self,tree):
+
+
+
+    def tipo(self, tree):
         for elemento in tree.children:
             return elemento.value
 
@@ -254,47 +398,60 @@ class MyInterpreter(Interpreter):
                                 if x['nome'] == id:
                                     x['usada'] = True
 
-    def op(self,tree):
+
+    def op(self, tree):
         pass
 
-    def oplist(self,tree):
+
+    def oplist(self, tree):
         pass
 
-    def params(self,tree):
+
+    def params(self, tree):
         return self.visit_children(tree)
 
-    def param(self,tree):
+
+    def param(self, tree):
         for elemento in tree.children:
-            if (type(elemento)==Tree):
-                if( elemento.data == 'tipo'):
+            if (type(elemento) == Tree):
+                if (elemento.data == 'tipo'):
                     t = self.visit(elemento)
             else:
-                if (elemento.type=='ID'):
+                if (elemento.type == 'ID'):
                     id = elemento.value
-        #print("Elementos visitados, vou regressar à main()")
+        # print("Elementos visitados, vou regressar à main()")
+        # print("Elementos visitados, vou regressar à main()")
         if id not in [x['nome'] for x in self.variaveis['GLOBAL']]:
             if self.inFuncao():
                 if self.funcAct() not in self.variaveis.keys():
                     self.variaveis[self.funcAct()] = []
                 if id not in [x['nome'] for x in self.variaveis[self.funcAct()]]:
-                    self.variaveis[self.funcAct()].append({'nome':id,'tipo':t,'usada':False})
+                    self.variaveis[self.funcAct()].append(
+                        {'nome': id, 'tipo': t, 'usada': False})
+                    self.variaveis[self.funcAct()].append(
+                        {'nome': id, 'tipo': t, 'usada': False})
                 else:
                     print("Variavel "+id+" já declarada")
             else:
-                self.variaveis['GLOBAL'].append({'nome':id,'tipo':t,'usada':False})
+                self.variaveis['GLOBAL'].append(
+                    {'nome': id, 'tipo': t, 'usada': False})
+                self.variaveis['GLOBAL'].append(
+                    {'nome': id, 'tipo': t, 'usada': False})
         else:
             print("Variavel "+id+" já declarada")
             return
 
-    def corpofunc(self,tree):
+
+    def corpofunc(self, tree):
         self.visit_children(tree)
 
-    def atribuicao(self,tree):
+
+    def atribuicao(self, tree):
         for elemento in tree.children:
             if (type(elemento)==Tree):
                 self.visit(elemento)
             else:
-                if (elemento.type=='ID'):
+                if (elemento.type == 'ID'):
                     id = elemento.value
         if id not in [x['nome'] for x in self.variaveis['GLOBAL']]:
             if self.inFuncao():
@@ -325,7 +482,7 @@ class MyInterpreter(Interpreter):
                     if not self.checkDecl(id):
                         print("Variavel "+id+" não declarada")
 
-    def ficheiro(self,tree):
+    def ficheiro(self, tree):
         pass
 
     def selecao(self,tree):
@@ -338,10 +495,13 @@ class MyInterpreter(Interpreter):
                     if not self.checkDecl(id):
                         print("Variavel "+id+" não declarada")
 
-    def repeticao(self,tree):
+
+    def repeticao(self, tree):
         self.visit_children(tree)
-        
-    def retorno(self,tree):
+
+
+
+    def retorno(self, tree):
         self.visit_children(tree)
 
     def comp(self,tree):
@@ -354,13 +514,15 @@ class MyInterpreter(Interpreter):
                     if not self.checkDecl(id):
                         print("Variavel "+id+" não declarada")
 
-    def sinalcomp(self,tree):
+
+    def sinalcomp(self, tree):
         pass
 
     def caso(self,tree):
         self.visit_children(tree)
 
-    def interv(self,tree):
+
+    def interv(self, tree):
         pass
 
     def elemcomp(self,tree):
@@ -399,130 +561,134 @@ class MyInterpreter(Interpreter):
     def ID(self,tree):
         return tree.value
 
-    def COMENTARIO(self,tree):
+    def COMENTARIO(self, tree):
         pass
 
-    def PVIR(self,tree):
+    def PVIR(self, tree):
         pass
 
-    def DEF(self,tree):
+    def DEF(self, tree):
         pass
 
-    def INT(self,tree):
+    def INT(self, tree):
         pass
 
-    def BOOLEAN(self,tree):
+    def BOOLEAN(self, tree):
         pass
 
-    def STRING(self,tree):
+    def STRING(self, tree):
         pass
 
-    def ARRAY(self,tree):
+    def ARRAY(self, tree):
         pass
 
-    def TUPLO(self,tree):
+    def TUPLO(self, tree):
         pass
 
-    def LISTA(self,tree):
+    def LISTA(self, tree):
         pass
 
-    def NUM(self,tree):
+    def NUM(self, tree):
         pass
 
-    def ADD(self,tree):
+    def ADD(self, tree):
         pass
 
-    def SUB(self,tree):
+    def SUB(self, tree):
         pass
 
-    def DIV(self,tree):
+    def DIV(self, tree):
         pass
 
-    def MULT(self,tree):
+    def MULT(self, tree):
         pass
 
-    def EXPO(self,tree):
+    def EXPO(self, tree):
         pass
 
-    def PERC(self,tree):
+    def PERC(self, tree):
         pass
 
-    def CONS(self,tree):
+    def CONS(self, tree):
         pass
 
-    def SNOC(self,tree):
+    def SNOC(self, tree):
         pass
 
-    def IN(self,tree):
+
+    def IN(self, tree):
         pass
 
-    def HEAD(self,tree):
+    def HEAD(self, tree):
         pass
 
-    def TAIL(self,tree):
+    def TAIL(self, tree):
         pass
 
-    def VIR(self,tree):
+    def VIR(self, tree):
         pass
 
-    def LER(self,tree):
+    def LER(self, tree):
         pass
 
-    def ESCREVER(self,tree):
+    def ESCREVER(self, tree):
         pass
 
-    def SE(self,tree):
+    def SE(self, tree):
         pass
 
-    def CASO(self,tree):
+    def CASO(self, tree):
         pass
 
-    def ENQ(self,tree):
+    def ENQ(self, tree):
         pass
 
-    def FAZER(self,tree):
+    def FAZER(self, tree):
         pass
 
-    def END(self,tree):
+    def END(self, tree):
         pass
 
-    def REPETIR(self,tree):
+    def REPETIR(self, tree):
         pass
 
-    def ATE(self,tree):
+    def ATE(self, tree):
         pass
 
-    def PARA(self,tree):
+    def PARA(self, tree):
         pass
 
-    def RET(self,tree):
+    def RET(self, tree):
         pass
 
-    def EQ(self,tree):
+    def EQ(self, tree):
         pass
 
-    def GE(self,tree):
+    def GE(self, tree):
         pass
 
-    def LE(self,tree):
+    def LE(self, tree):
         pass
 
-    def DIF(self,tree):
+    def DIF(self, tree):
         pass
 
-    def LESS(self,tree):
+    def LESS(self, tree):
         pass
 
-    def G(self,tree):
+    def G(self, tree):
         pass
 
-    def STR(self,tree):
+    def STR(self, tree):
         pass
+
+
 
 f = open('linguagem.txt', 'r')
 frase = f.read()
 f.close()
 
-p = Lark(grammar) 
+p = Lark(grammar)
+p = Lark(grammar)
 tree = p.parse(frase)
 data = MyInterpreter().visit(tree)
