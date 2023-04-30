@@ -70,7 +70,7 @@ caso var "texto" : {
 }
 1 : {
     /* comentario */
-}end
+} end
 
 /* repeticao enq */
 enquanto 1 >= 1 
