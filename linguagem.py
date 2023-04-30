@@ -130,6 +130,11 @@ STR: /"(\\\"|[^"])*"/
 
 
 class MyInterpreter(Interpreter):
+   
+####################################################
+################# Auxiliar methods #################
+####################################################
+
     def funcAct(self):
         if len(self.funcStack) > 0:
             return self.funcStack[-1]
@@ -149,6 +154,27 @@ class MyInterpreter(Interpreter):
 
     def inFuncao(self):
         return self.funcAct() != None
+
+    def ecAct(self):
+        if len(self.ecStack) > 0:
+            return self.ecStack[-1]
+        else:
+            return None
+
+    def pushEc(self, func):
+        self.ecStack.append(func)
+
+    def getTabEc(self):
+        # get the number of functions in the stack
+        n = len(self.ecStack)
+        return "\t" * n
+
+    def popEc(self):
+        self.ecStack.pop()
+
+    def inEc(self):
+        return self.ecAct() != None
+
 
     def checkDecl(self,id):
         if id in [x['nome'] for x in self.variaveis['GLOBAL']]:
@@ -185,6 +211,7 @@ class MyInterpreter(Interpreter):
                 s2 =  " "*(maxtipo-len(y['tipo']))
                 s = "\t\t"+y['nome']+s1+" : "+y['tipo']+s2+" : "+str(y['usada'])+" : "+str(y['atribuicao'])+" :"
                 print(s)
+    
     def htmlInit(self):
         self.HTML += ''' 
         <!DOCTYPE html>
@@ -316,6 +343,10 @@ class MyInterpreter(Interpreter):
     def writeHTML(self):
         f = open("output.html", "w")
         f.write(self.HTML)
+
+#####################################################
+################ Interpreter methods ################
+#####################################################
 
     def __init__(self):
         self.variaveis = {}
@@ -323,6 +354,8 @@ class MyInterpreter(Interpreter):
         self.funcStack = []
         self.instructions = {}
         self.HTML = ""
+        self.eC = {}
+        self.ecStack = []
 
     def start(self, tree):
         self.variaveis['GLOBAL'] = []
@@ -333,7 +366,7 @@ class MyInterpreter(Interpreter):
         self.htmlEnd()
         self.writeHTML()
         # fim do programa
-        self.printVars()
+        #self.printVars()
         
         #for x in self.instructions.keys():
         #    print("Instrucao "+ x + " : " + str(self.instructions[x]))
@@ -431,8 +464,6 @@ class MyInterpreter(Interpreter):
                 if (elemento.type == 'PVIR'):
                     self.HTML += "<span class='code'> ; </span> <br>"
 
-
-
     def tipo(self, tree):
         for elemento in tree.children:
             return elemento.value
@@ -498,11 +529,9 @@ class MyInterpreter(Interpreter):
         for elemento in tree.children:
             return elemento.value
 
-
     def oplist(self, tree):
         for elemento in tree.children:
             return elemento.value
-
 
     def params(self, tree):
         for elemento in tree.children:
@@ -539,11 +568,9 @@ class MyInterpreter(Interpreter):
             print("Variavel "+id+" já declarada (1)")
             return
 
-
     def corpofunc(self, tree):
         self.HTML += "<span class='code'> ) </span> <br> <span class='code'> { </span> <br>"
         self.visit_children(tree)
-
 
     def atribuicao(self, tree):
         for elemento in tree.children:
@@ -594,22 +621,25 @@ class MyInterpreter(Interpreter):
         pass
 
     def selecao(self,tree):
+        ec = self.ecAct()
         for elemento in tree.children:
+            t = ""
             if (type(elemento)==Tree):
                 self.visit(elemento)
             else:
-                if (elemento.type=='ID'):
+                if (elemento.type=='SE'):
+                    self.pushEc("if")
+                elif (elemento.type=='CASO'):
+                    t = "case"
+                elif (elemento.type=='ID'):
                     id = elemento.value
                     if not self.checkDecl(id):
                         print("Variavel "+id+" não declarada (2)")
                     else:
                         self.setVar(id,'usada',True)
 
-
     def repeticao(self, tree):
         self.visit_children(tree)
-
-
 
     def retorno(self, tree):
         self.visit_children(tree)
@@ -625,7 +655,6 @@ class MyInterpreter(Interpreter):
                         print("Variavel "+id+" não declarada (2)")
                     else:
                         self.setVar(id,'usada',True)
-
 
     def sinalcomp(self, tree):
         pass
