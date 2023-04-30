@@ -130,7 +130,6 @@ STR: /"(\\\"|[^"])*"/
 
 
 class MyInterpreter(Interpreter):
-   
 ####################################################
 ################# Auxiliar methods #################
 ####################################################
@@ -411,7 +410,7 @@ class MyInterpreter(Interpreter):
                     id = elemento.value
                     self.HTML += "<span class='code'> "+id+" </span>"
                 elif (elemento.type=='PVIR'):
-                    self.HTML += "<span class='code'>;</span> <br>"
+                    self.HTML += "<span class='code'> ; </span> <br>"
                     
                     
         # print("Elementos visitados")
@@ -668,11 +667,7 @@ class MyInterpreter(Interpreter):
                 elif (elemento.data == 'caso'):
                     self.visit(elemento)
             else:
-                if (elemento.type=='SE'):
-                    self.pushEc("if")
-                elif (elemento.type=='CASO'):
-                    t = "case"
-                elif (elemento.type=='ID'):
+                if (elemento.type=='ID'):
                     id = elemento.value
                     if not self.checkDecl(id):
                         print("Variavel "+id+" não declarada (2)")
