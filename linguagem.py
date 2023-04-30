@@ -127,8 +127,6 @@ STR: /"(\\\"|[^"])*"/
 
 
 # definir o transformer
-
-
 class MyInterpreter(Interpreter):
 ####################################################
 ################# Auxiliar methods #################
@@ -328,8 +326,14 @@ class MyInterpreter(Interpreter):
                 visibility: visible;
                 opacity: 1;
             }
+            
+            .graficos {
+                background-color: #F0F8FF;  
+                
+            }
+            
         </style>
-        <body>
+        <body class="graficos">
             <h2>Análise de código</h2>
             <pre><code>
         '''
@@ -377,6 +381,7 @@ class MyInterpreter(Interpreter):
     
     def componente(self, tree):
         for elemento in tree.children:
+            self.HTML += self.getTab()
             if(type(elemento) == Tree):
                 self.visit(elemento)
             else:
@@ -427,6 +432,7 @@ class MyInterpreter(Interpreter):
                 self.variaveis[self.funcAct()].append({'nome':id,'tipo':t,'usada':False,'atribuicao':atr})
 
     def deffuncao(self,tree):
+        self.HTML += self.getTab()
         for elemento in tree.children:
             if (type(elemento) == Tree):
                 if (elemento.data == 'tipo'):
@@ -452,6 +458,7 @@ class MyInterpreter(Interpreter):
             if not var['usada']:
                 print("Variavel "+var['nome']+" na funcao "+self.funcAct()+" nao usada (3)")
         self.popFunc()
+        self.HTML += self.getTab() + "<span class='code'> } </span> <br> \n"
 
     def instrucao(self, tree):
         for elemento in tree.children:
@@ -570,7 +577,7 @@ class MyInterpreter(Interpreter):
             return
 
     def corpofunc(self, tree):
-        self.HTML += "<span class='code'> ) </span> <br> <span class='code'> { </span> <br>"
+        self.HTML += "<span class='code'> ) </span><span class='code'> { </span> <br>"
         for elemento in tree.children:
             if (type(elemento)==Tree):
                 if(elemento.data == 'componentes'):
@@ -579,7 +586,6 @@ class MyInterpreter(Interpreter):
                     self.visit(elemento)
                 elif(elemento.data == 'retorno'):
                     self.visit(elemento)
-        self.HTML += "<span class='code'> } </span> <br>"
 
     def atribuicao(self, tree):
         for elemento in tree.children:
@@ -719,8 +725,8 @@ class MyInterpreter(Interpreter):
                     id = elemento.value
                     self.HTML += "<span class='code'> "+id+" </span>"
 
-
     def retorno(self, tree):
+        self.HTML += self.getTab()
         for elemento in tree.children:
             if (type(elemento) == Tree):
                 if (elemento.data == 'elemcomp'):
@@ -751,7 +757,6 @@ class MyInterpreter(Interpreter):
                         self.setVar(id,'usada',True)
                         self.HTML += "<span class='code'>!"+id+" </span>"
                         
-
     def sinalcomp(self, tree):
         for elemento in tree.children:
             return elemento.value
@@ -814,7 +819,6 @@ class MyInterpreter(Interpreter):
                     t = elemento.value
                     self.HTML += "<span class='code'> " + t + " </span>"
                 
-
     def funcao(self,tree):
         first = True;
         for elemento in tree.children:
@@ -842,7 +846,6 @@ class MyInterpreter(Interpreter):
                     self.HTML += "<span class='code'>, </span>"
         self.HTML += "<span class='code'> ] </span>"
         
-
     def tuplo(self,tree):
         self.HTML += "<span class='code'> ( </span>"
         for elemento in tree.children:
