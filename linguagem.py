@@ -292,6 +292,31 @@ class MyInterpreter(Interpreter):
             .code {
                 position: relative;
                 display: inline-block;
+                color: black;
+            }
+            
+            .funcName{
+                position: relative;
+                display: inline-block;
+                color: #5C2397;
+            }
+            
+            .def {
+                position: relative;
+                display: inline-block;
+                color: #6c99bb
+            }
+            
+            .ciclo {
+                position: relative;
+                display: inline-block;
+                color: #CB692B;
+            }
+            
+            .retornos {
+                position: relative;
+                display: inline-block;
+                color: #A49A50;
             }
             
             .error .errortext {
@@ -328,14 +353,38 @@ class MyInterpreter(Interpreter):
             }
             
             .graficos {
-                background-color: #F0F8FF;  
-                
+                background-color: #E6E4E3;   
+            }
+            
+            .redeclaracao {
+                position: relative;
+                display: inline-block;
+                border-bottom: 2px dotted black;
+                color: red;
+            }
+            
+            .naoDeclaracao {
+                position: relative;
+                display: inline-block;
+                border-bottom: 2px dotted black;
+                color: #F781D8;
+            }
+            
+            .naoInicializada {
+                position: relative;
+                display: inline-block;
+                border-bottom: 2px dotted black;
+                color: #13590C;
             }
             
         </style>
         <body class="graficos">
-            <h2>Análise de código</h2>
+            <h2 class="code">Análise de código</h2>
             <pre><code>
+            <h3 class="code">Instruções de Análise - Variáveis</h3>
+            <span class="redeclaracao">Cor -</span> <span class="code"> Redeclaração </span> <br> \n
+            <span class="naoDeclaracao">Cor -</span> <span class="code"> Não-Declaração </span> <br> \n
+            <span class="naoInicializada">Cor -</span> <span class="code"> Não-Inicializada </span> <br> \n
         '''
     
     def htmlEnd(self):
@@ -413,9 +462,12 @@ class MyInterpreter(Interpreter):
                 if (elemento.type=='ID'):
                     # obter o valor do terminal
                     id = elemento.value
-                    self.HTML += "<span class='code'> "+id+" </span>"
+                    if self.checkDecl(id):
+                        self.HTML += "<span class='redeclaracao'> "+id+" </span>"
+                    else:
+                        self.HTML += "<span class='code'> "+id+" </span>"
                 elif (elemento.type=='PVIR'):
-                    self.HTML += "<span class='code'> ; </span> <br>"
+                    self.HTML += "<span class='code'> ; </span> <br> <br>"
                     
                     
         # print("Elementos visitados")
@@ -449,11 +501,11 @@ class MyInterpreter(Interpreter):
                 if (elemento.type == 'ID'):
                     self.pushFunc(elemento.value)
                     t = elemento.value
-                    self.HTML += "<span class='code'> " + t + " ( </span>"
+                    self.HTML += "<span class='funcName'> " + t + "</span> <span class='code'> ( </span>"
                     
                 elif (elemento.type == 'DEF'):
                     t = elemento.value
-                    self.HTML += "<span class='code'> " + t + " </span>"
+                    self.HTML += "<span class='def'> " + t + " </span>"
         for var in self.variaveis[self.funcAct()]:
             if not var['usada']:
                 print("Variavel "+var['nome']+" na funcao "+self.funcAct()+" nao usada (3)")
@@ -470,7 +522,7 @@ class MyInterpreter(Interpreter):
                 self.visit(elemento)
             else:
                 if (elemento.type == 'PVIR'):
-                    self.HTML += "<span class='code'> ; </span> <br>"
+                    self.HTML += "<span class='code'> ; </span> <br> <br>"
 
     def tipo(self, tree):
         for elemento in tree.children:
@@ -504,7 +556,7 @@ class MyInterpreter(Interpreter):
                         i+=1
                         if not self.checkDecl(id):
                             print("Variavel "+id+" não declarada (2)")
-                            self.HTML += "<span class='error'> "+id+"</span>"
+                            self.HTML += "<span class='naoDeclaracao'> "+id+"</span>"
                         else:
                             if self.inFuncao():
                                 for x in self.variaveis[self.funcAct()]:
@@ -512,13 +564,18 @@ class MyInterpreter(Interpreter):
                                         self.setVar(id,'usada',True)
                                         if x['atribuicao'] == False:
                                             print("Variavel "+id+" não inicializada (4)")
+                                            self.HTML += "<span class='naoInicializada'> "+id+"</span>"
+                                        else:
+                                            self.HTML += "<span class='code'> "+id+"</span>"
                             else:
                                 for x in self.variaveis['GLOBAL']:
                                     if x['nome'] == id:
                                         self.setVar(id,'usada',True)
                                         if x['atribuicao'] == False:
                                             print("Variavel "+id+" não inicializada (4)")
-                            self.HTML += "<span class='code'> "+id+"</span>"
+                                            self.HTML += "<span class='naoInicializada'> "+id+"</span>"
+                                        else:
+                                            self.HTML += "<span class='code'> "+id+"</span>"
                     else:
                         self.HTML += "<span class='code'>."+id+"</span>"
                 elif (elemento.type == 'NUM'):
@@ -577,7 +634,7 @@ class MyInterpreter(Interpreter):
             return
 
     def corpofunc(self, tree):
-        self.HTML += "<span class='code'> ) </span><span class='code'> { </span> <br>"
+        self.HTML += "<span class='code'> ) </span><span class='code'> { </span> <br> <br>"
         for elemento in tree.children:
             if (type(elemento)==Tree):
                 if(elemento.data == 'componentes'):
@@ -618,7 +675,7 @@ class MyInterpreter(Interpreter):
                     id = elemento.value
                     if not self.checkDecl(id):
                         print("Variavel "+id+" não declarada (2)")
-                        self.HTML += "<span class='error'>, "+id+" ) </span>"
+                        self.HTML += "<span class='naoDeclaracao'>, "+id+" ) </span>"
                     else:
                         self.setVar(id,'atribuicao',True)
                         self.HTML += "<span class='code'>, "+id+" ) </span>"
@@ -636,7 +693,7 @@ class MyInterpreter(Interpreter):
                     id = elemento.value
                     if not self.checkDecl(id):
                         print("Variavel "+id+" não declarada (2)")
-                        self.HTML += "<span class='error'>, "+id+" ) </span>"
+                        self.HTML += "<span class='naoDeclaracao'>, "+id+" ) </span>"
                     else:
                         self.setVar(id,'atribuicao',True)
                         self.HTML += "<span class='code'>, "+id+" ) </span>"
@@ -667,7 +724,7 @@ class MyInterpreter(Interpreter):
             if (type(elemento)==Tree):
                 if (elemento.data == 'comp'):
                     self.visit(elemento)
-                    self.HTML += "<span class='code'> { </span> <br>"
+                    self.HTML += "<span class='code'> { </span> <br> <br>"
                 elif (elemento.data == 'componente'):
                     self.visit(elemento)
                 elif (elemento.data == 'caso'):
@@ -677,24 +734,24 @@ class MyInterpreter(Interpreter):
                     id = elemento.value
                     if not self.checkDecl(id):
                         print("Variavel "+id+" não declarada (2)")
-                        self.HTML += "<span class='error'> "+id+" </span>"
+                        self.HTML += "<span class='naoDeclaracao'> "+id+" </span>"
                     else:
                         self.setVar(id,'usada',True)
                         self.HTML += "<span class='code'> "+id+" </span>"
                 elif (elemento.type=='SE'):
                     se = True
                     t = elemento.value
-                    self.HTML += "<span class='code'> "+t+" </span>"
+                    self.HTML += "<span class='ciclo'> "+t+" </span>"
                 
                 elif (elemento.type=='CASO'):
                     t = elemento.value
-                    self.HTML += "<span class='code'> "+t+" </span>"
+                    self.HTML += "<span class='ciclo'> "+t+" </span>"
                     
                 elif (elemento.type=='END'):
                     t = elemento.value
-                    self.HTML += "<span class='code'> "+t+" </span> <br>"
+                    self.HTML += "<span class='ciclo'> "+t+" </span> <br> <br>"
         if se:             
-            self.HTML += "<span class='code'> } </span> <br>"
+            self.HTML += "<span class='code'> } </span> <br> <br>"
 
     def repeticao(self, tree):
         for elemento in tree.children:
@@ -708,22 +765,22 @@ class MyInterpreter(Interpreter):
             else:
                 if (elemento.type=='ENQ'):
                     id = elemento.value
-                    self.HTML += "<span class='code'> "+id+" </span>"
+                    self.HTML += "<span class='ciclo'> "+id+" </span>"
                 elif (elemento.type=='FAZER'):
                     id = elemento.value
-                    self.HTML += "<span class='code'> "+id+" </span>"
+                    self.HTML += "<span class='ciclo'> "+id+" </span>"
                 elif (elemento.type=='END'):
                     id = elemento.value
-                    self.HTML += "<span class='code'> "+id+" </span> <br>"
+                    self.HTML += "<span class='ciclo'> "+id+" </span> <br> <br>"
                 elif (elemento.type == 'REPETIR'):
                     id = elemento.value
-                    self.HTML += "<span class='code'> "+id+" </span>"
+                    self.HTML += "<span class='ciclo'> "+id+" </span>"
                 elif (elemento.type == 'ATE'):
                     id = elemento.value
-                    self.HTML += "<span class='code'> "+id+" </span>"
+                    self.HTML += "<span class='ciclo'> "+id+" </span>"
                 elif (elemento.type == 'PARA'):
                     id = elemento.value
-                    self.HTML += "<span class='code'> "+id+" </span>"
+                    self.HTML += "<span class='ciclo'> "+id+" </span>"
 
     def retorno(self, tree):
         self.HTML += self.getTab()
@@ -734,10 +791,10 @@ class MyInterpreter(Interpreter):
             else:
                 if (elemento.type =='RET'):
                     id = elemento.value
-                    self.HTML += "<span class='code'> "+id+" </span>"
+                    self.HTML += "<span class='retornos'> "+id+" </span>"
                 elif (elemento.type =='PVIR'):
                     id = elemento.value
-                    self.HTML += "<span class='code'> "+id+" </span> <br>"
+                    self.HTML += "<span class='code'> "+id+" </span> <br> <br>"
                 
     def comp(self,tree):
         for elemento in tree.children:
@@ -752,7 +809,7 @@ class MyInterpreter(Interpreter):
                     id = elemento.value
                     if not self.checkDecl(id):
                         print("Variavel "+id+" não declarada (2)")
-                        self.HTML += "<span class='error'>!"+id+" </span>"
+                        self.HTML += "<span class='naoDeclaracao'>!"+id+" </span>"
                     else:
                         self.setVar(id,'usada',True)
                         self.HTML += "<span class='code'>!"+id+" </span>"
@@ -766,11 +823,11 @@ class MyInterpreter(Interpreter):
             if (type(elemento) == Tree):
                 if (elemento.data == 'elemcomp'):
                     self.visit(elemento)
-                    self.HTML += "<span class='code'> : { </span> <br>"
+                    self.HTML += "<span class='code'> : { </span> <br> <br>"
                     
                 elif (elemento.data == 'componente'):
                     self.visit(elemento)
-        self.HTML += "<span class='code'> } </span> <br>"            
+        self.HTML += "<span class='code'> } </span> <br> <br>"            
         
     def interv(self, tree):
         first = True
@@ -796,7 +853,7 @@ class MyInterpreter(Interpreter):
                     id = elemento.value
                     if not self.checkDecl(id):
                         print("Variavel "+id+" não declarada (2)")
-                        self.HTML += "<span class='error'> " + id + " </span>"
+                        self.HTML += "<span class='naoDeclaracao'> " + id + " </span>"
                     else:
                         if self.inFuncao():
                             for x in self.variaveis[self.funcAct()]:
@@ -805,13 +862,19 @@ class MyInterpreter(Interpreter):
                                     self.setVar(id,'usada',True)
                                     if x['atribuicao'] == False:
                                         print("Variavel "+id+" não inicializada (4)")
+                                        self.HTML += "<span class='naoInicializada'> " + id + " </span>"
+                                    else:
+                                        self.HTML += "<span class='code'> " + id + " </span>"
                         else:
                             for x in self.variaveis['GLOBAL']:
                                 if x['nome'] == id:
                                     self.setVar(id,'usada',True)
                                     if x['atribuicao'] == False:
                                         print("Variavel "+id+" não inicializada (4)")
-                        self.HTML += "<span class='code'> " + id + " </span>"
+                                        self.HTML += "<span class='naoInicializada'> " + id + " </span>"
+                                    else:
+                                        self.HTML += "<span class='code'> " + id + " </span>"
+                
                 elif (elemento.type=='NUM'):
                     num = elemento.value
                     self.HTML += "<span class='code'> " + num + " </span>"
@@ -832,7 +895,7 @@ class MyInterpreter(Interpreter):
             else: 
                 if (elemento.type == 'ID'):
                     id = elemento.value
-                    self.HTML += "<span class='code'> " + id + " ( </span>"
+                    self.HTML += "<span class='funcName'> " + id + " </span> <span class='code'>(</span>"
         self.HTML += "<span class='code'> ) </span>" 
         
     def array(self,tree):
