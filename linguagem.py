@@ -175,6 +175,8 @@ class MyInterpreter(Interpreter):
     def inEc(self):
         return self.ecAct() != None
 
+    def getTab(self):
+        return self.getTabFunc() + self.getTabEc()
 
     def checkDecl(self,id):
         if id in [x['nome'] for x in self.variaveis['GLOBAL']]:
