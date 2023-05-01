@@ -1,0 +1,38 @@
+int queCenaMeu=1;
+
+
+/* selecao if */
+se 1 == 1 {
+}
+
+/* selecao if */
+se 1 == 1 {
+    f(queCenaMeu);
+}
+
+
+/* selecao if */
+se 1 == 1 {
+    se 1 == 1 {
+        f(queCenaMeu);
+    }
+    f(queCenaMeu);
+}
+
+/* selecao if */
+se 1 == 1 {
+    se 1 == 1 {
+        f(queCenaMeu);
+    }
+}
+
+
+/* selecao if */
+se 1 == 1 {
+    /* selecao if */
+    caso queCenaMeu 1: {
+        se 1 == 1 {
+            f(queCenaMeu);
+        }
+    }end
+}

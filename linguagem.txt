@@ -67,6 +67,7 @@ se 1 == 1 {
 /* selecao caso */
 caso var "texto" : {
     tuplo k = 14 % 2;
+    tuplo kaCena = 14 % 2;
 }
 1 : {
     /* comentario */

@@ -37,12 +37,12 @@ oplist : CONS
     | TAIL
 params: param (VIR param)*
 param: tipo ID
-corpofunc: "{" (componentes|deffuncao|retorno)* "}"
+corpofunc: "{" (componente|deffuncao|retorno)* "}"
 atribuicao: ID "=" (ecomp)
 leitura: LER "(" ficheiro "," ID ")"
 escrita: ESCREVER "(" ficheiro "," ID ")"
 ficheiro: ID ("." ID)?
-selecao: SE comp "{" componente* "}"
+selecao: SE comp "{" (declaracao|COMENTARIO|instrucao)* "}"
         | CASO ID caso+ END
 repeticao: ENQ comp FAZER componente+ END
         | REPETIR componente+ ATE comp END
