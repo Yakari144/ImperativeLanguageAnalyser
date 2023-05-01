@@ -1,6 +1,7 @@
 from lark import Lark, Token, Tree
 from lark.visitors import Interpreter
 from lark import Discard
+from bs4 import BeautifulSoup
 import json
 from bs4 import BeautifulSoup
 
@@ -340,6 +341,7 @@ class MyInterpreter(Interpreter):
     def writeHTML(self):
         f = open("output.html", "w")
         f.write(self.HTML)
+        f.close()
 
     def htmlInit(self):
         self.HTML += ''' 
@@ -441,6 +443,13 @@ class MyInterpreter(Interpreter):
                 color: #13590C;
             }
             
+            .naoUsada {
+                position: relative;
+                display: inline-block;
+                border-bottom: 2px dotted black;
+                color: #818589;
+            }
+            
         </style>
         <body class="graficos">
             <h2 class="code">Análise de código</h2>
@@ -449,6 +458,7 @@ class MyInterpreter(Interpreter):
             <span class="redeclaracao">Cor -</span> <span class="code"> Redeclaração </span> <br> \n
             <span class="naoDeclaracao">Cor -</span> <span class="code"> Não-Declaração </span> <br> \n
             <span class="naoInicializada">Cor -</span> <span class="code"> Não-Inicializada </span> <br> \n
+            <span class="naoUsada">Cor -</span> <span class="code"> Não-Utilizada </span> <br> \n
         '''
     
     def htmlEnd(self):
@@ -462,6 +472,31 @@ class MyInterpreter(Interpreter):
         f = open("output.html", "w")
         f.write(self.HTML)
 
+    
+    def updateHTML(self):
+        varsUnnused = []
+        
+        for x in self.variaveis.keys():
+            for y in self.variaveis[x]:
+                if y['usada'] == False:
+                    if x == "GLOBAL":
+                        varsUnnused.append("None-" + y['nome'])
+                    else:
+                        varsUnnused.append(x + "-" + y['nome'])
+        
+        for t in varsUnnused:
+            print("Variável --> " + t + " não utilizada")
+        
+        soup = BeautifulSoup(self.HTML, 'html.parser')
+        
+        
+        for var in varsUnnused:
+            for x in soup.find_all('span', id=var):
+                x['class'] = 'naoUsada'
+            self.HTML = str(soup)
+        
+        
+        
 #####################################################
 ################ Interpreter methods ################
 #####################################################
@@ -482,10 +517,11 @@ class MyInterpreter(Interpreter):
         self.HTML += "<br>"
         self.visit_children(tree)
         self.htmlEnd()
+        self.updateHTML()
         self.writeHTML()
         self.countEc()
         # fim do programa
-        #self.printVars()
+        self.printVars()
         # print the Selecao tree
         print(json.dumps(self.eC, indent=4))
         
@@ -530,9 +566,9 @@ class MyInterpreter(Interpreter):
                     # obter o valor do terminal
                     id = elemento.value
                     if self.checkDecl(id):
-                        self.HTML += "<span class='redeclaracao'> "+id+" </span>"
+                        self.HTML += "<span class='redeclaracao' id ='"+ str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
                     else:
-                        self.HTML += "<span class='code'> "+id+" </span>"
+                        self.HTML += "<span class='code' id ='"+ str(self.funcAct()) + "-" + id +"'> " + id + " </span>"
                 elif (elemento.type=='PVIR'):
                     self.HTML += "<span class='code'> ; </span> <br> <br>"
                     
@@ -623,7 +659,7 @@ class MyInterpreter(Interpreter):
                         i+=1
                         if not self.checkDecl(id):
                             print("Variavel "+id+" não declarada (2)")
-                            self.HTML += "<span class='naoDeclaracao'> "+id+"</span>"
+                            self.HTML += "<span class='naoDeclaracao id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
                         else:
                             if self.inFuncao():
                                 for x in self.variaveis[self.funcAct()]:
@@ -631,20 +667,20 @@ class MyInterpreter(Interpreter):
                                         self.setVar(id,'usada',True)
                                         if x['atribuicao'] == False:
                                             print("Variavel "+id+" não inicializada (4)")
-                                            self.HTML += "<span class='naoInicializada'> "+id+"</span>"
+                                            self.HTML += "<span class='naoInicializada' id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
                                         else:
-                                            self.HTML += "<span class='code'> "+id+"</span>"
+                                            self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
                             else:
                                 for x in self.variaveis['GLOBAL']:
                                     if x['nome'] == id:
                                         self.setVar(id,'usada',True)
                                         if x['atribuicao'] == False:
                                             print("Variavel "+id+" não inicializada (4)")
-                                            self.HTML += "<span class='naoInicializada'> "+id+"</span>"
+                                            self.HTML += "<span class='naoInicializada' id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
                                         else:
-                                            self.HTML += "<span class='code'> "+id+"</span>"
+                                            self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
                     else:
-                        self.HTML += "<span class='code'>."+id+"</span>"
+                        self.HTML += "<span class='code' >."+id+"</span>"
                 elif (elemento.type == 'NUM'):
                     if (firstEntry == 0):
                         firstEntry = 1
@@ -683,7 +719,7 @@ class MyInterpreter(Interpreter):
             else:
                 if (elemento.type == 'ID'):
                     id = elemento.value
-                    self.HTML += "<span class='code'> " + id + " </span>"
+                    self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
         # print("Elementos visitados, vou regressar à main()")
         # print("Elementos visitados, vou regressar à main()")
         if id not in [x['nome'] for x in self.variaveis['GLOBAL']]:
@@ -718,7 +754,7 @@ class MyInterpreter(Interpreter):
             else:
                 if (elemento.type == 'ID'):
                     id = elemento.value
-                    self.HTML += "<span class='code'> " + id + " = </span>"
+                    self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
         if id not in [x['nome'] for x in self.variaveis['GLOBAL']]:
             if self.inFuncao():
                 if self.funcAct() not in self.variaveis.keys():
@@ -744,8 +780,8 @@ class MyInterpreter(Interpreter):
                         print("Variavel "+id+" não declarada (2)")
                         self.HTML += "<span class='naoDeclaracao'>, "+id+" ) </span>"
                     else:
-                        self.setVar(id,'atribuicao',True)
-                        self.HTML += "<span class='code'>, "+id+" ) </span>"
+                        self.setVar(id,'atribuicao',True) 
+                        self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'>," + id + " (</span>"
                 if (elemento.type=='LER'):
                     t = elemento.value
                     self.HTML += "<span class='code'>" + t + " ( </span>"
@@ -763,7 +799,7 @@ class MyInterpreter(Interpreter):
                         self.HTML += "<span class='naoDeclaracao'>, "+id+" ) </span>"
                     else:
                         self.setVar(id,'atribuicao',True)
-                        self.HTML += "<span class='code'>, "+id+" ) </span>"
+                        self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'>," + id + " ) </span>"
                 if (elemento.type=='ESCREVER'):
                     t = elemento.value
                     self.HTML += "<span class='code'>" + t + " ( </span>"
@@ -778,10 +814,10 @@ class MyInterpreter(Interpreter):
                     if first:
                         id = elemento.value
                         first = False
-                        self.HTML += "<span class='code'> "+id+"</span>"
+                        self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
                     else:
                         id = elemento.value
-                        self.HTML += "<span class='code'>."+id+" </span>"
+                        self.HTML += "<span class='code' >."+id+" </span>"
 
     def selecao(self,tree):
         se = False
@@ -803,7 +839,7 @@ class MyInterpreter(Interpreter):
                         self.HTML += "<span class='naoDeclaracao'> "+t+" </span>"
                     else:
                         self.setVar(t,'usada',True)
-                    self.HTML += "<span class='code'> "+t+" </span>  <br>"
+                    self.HTML += "<span class='code' id ='"+ str(self.funcAct()) + "-" + t + "'>" + t + " </span> <br>"
                 elif (elemento.type=='SE'):
                     self.pushEc("if")
                     se = True
@@ -919,7 +955,7 @@ class MyInterpreter(Interpreter):
                                         print("Variavel "+id+" não inicializada (4)")
                                         self.HTML += "<span class='naoInicializada'> " + id + " </span>"
                                     else:
-                                        self.HTML += "<span class='code'> " + id + " </span>"
+                                        self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'> " + id + " </span>"
                         else:
                             for x in self.variaveis['GLOBAL']:
                                 if x['nome'] == id:
@@ -928,8 +964,8 @@ class MyInterpreter(Interpreter):
                                         print("Variavel "+id+" não inicializada (4)")
                                         self.HTML += "<span class='naoInicializada'> " + id + " </span>"
                                     else:
-                                        self.HTML += "<span class='code'> " + id + " </span>"
-
+                                        self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'> " + id + " </span>"
+                
                 elif (elemento.type=='NUM'):
                     num = elemento.value
                     self.HTML += "<span class='code'> " + num + " </span>"
@@ -949,8 +985,8 @@ class MyInterpreter(Interpreter):
                     self.visit(elemento)
             else: 
                 if (elemento.type == 'ID'):
-                    id = elemento.value
-                    self.HTML += "<span class='funcName'> " + id + " </span> <span class='code'>(</span>"
+                    id = elemento.value     
+                    self.HTML += "<span class='funcName' id ='"+ str(self.funcAct()) + "-" + id +"'> " + id + " </span> <span class='code'>(</span>"
         self.HTML += "<span class='code'> ) </span>" 
         
     def array(self,tree):
@@ -1004,3 +1040,7 @@ p = Lark(grammar)
 p = Lark(grammar)
 tree = p.parse(frase)
 data = MyInterpreter().visit(tree)
+
+
+
+
