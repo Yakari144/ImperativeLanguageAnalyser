@@ -3,36 +3,30 @@ int queCenaMeu=1;
 
 /* selecao if */
 se 1 == 1 {
-}
-
-/* selecao if */
-se 1 == 1 {
-    f(queCenaMeu);
+    
 }
 
 
-/* selecao if */
-se 1 == 1 {
-    se 1 == 1 {
-        f(queCenaMeu);
-    }
-    f(queCenaMeu);
-}
 
+/* repeticao enq */
+    enquanto 1 >= 1 
+    fazer 
+        f();
+    end
+    
 /* selecao if */
-se 1 == 1 {
-    se 1 == 1 {
-        f(queCenaMeu);
-    }
-}
-
-
-/* selecao if */
-se 1 == 1 {
+se 1 == 1 {/* repeticao enq */
+    enquanto 1 >= 1 
+    fazer 
     /* selecao if */
-    caso queCenaMeu 1: {
-        se 1 == 1 {
-            f(queCenaMeu);
-        }
-    }end
+se 1 == 1 {
+    
+/* repeticao enq */
+    enquanto 1 >= 1 
+    fazer 
+        f();
+    end
 }
+    end
+} 
+    

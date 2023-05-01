@@ -2,6 +2,7 @@ from lark import Lark, Token, Tree
 from lark.visitors import Interpreter
 from lark import Discard
 import json
+from bs4 import BeautifulSoup
 
 # Primeiro precisamos da GIC
 grammar = r'''
@@ -196,6 +197,44 @@ class MyInterpreter(Interpreter):
 
     def inEc(self):
         return self.ecAct() != None
+
+#"if1": {
+#    "do1": {
+#        "if2": {}
+#    }
+#}
+
+# c = [ 0, 1,  1,  0,  0,  1]
+
+    def countEcAux(self,d):
+        #     0 1   2   3   4   5
+        #    cs cr csr css crr crs
+        c = [ 0, 0,  0,  0,  0,  0]
+        for x in d.keys():
+            for a in ['do','while','for']:
+                if a in x:
+                    c[1] += 1
+                    c2 = self.countEcAux(d[x])
+                    c[2] += c2[2]
+                    c[3] += c2[3]
+                    c[4] += c2[1] + c2[2] + c2[4]
+                    c[5] += c2[0] + c2[3] + c2[5]
+            for a in ['if','case']:
+                if a in x:
+                    c[0] += 1
+                    c2 = self.countEcAux(d[x])
+                    c[2] += c2[1] + c2[2] + c2[4]
+                    c[3] += c2[0] + c2[3] + c2[5]
+                    c[4] += c2[4]
+                    c[5] += c2[5]
+        return c
+
+    def countEc(self):
+        c = self.countEcAux(self.eC)
+        print("SE's dentro de SE's: " + str(c[3]))
+        print("SE's dentro de REP's: " + str(c[5]))
+        print("REP's dentro de SE's: " + str(c[2]))
+        print("REP's dentro de REP's: " + str(c[4]))
 
     def getTab(self):
         return self.getTabFunc() + self.getTabEc()
@@ -444,10 +483,11 @@ class MyInterpreter(Interpreter):
         self.visit_children(tree)
         self.htmlEnd()
         self.writeHTML()
+        self.countEc()
         # fim do programa
         #self.printVars()
         # print the Selecao tree
-        #print(json.dumps(self.eC, indent=4))
+        print(json.dumps(self.eC, indent=4))
         
         #for x in self.instructions.keys():
         #    print("Instrucao "+ x + " : " + str(self.instructions[x]))
@@ -794,63 +834,46 @@ class MyInterpreter(Interpreter):
     def repeticao(self, tree):
         for elemento in tree.children:
             if (type(elemento) == Tree):
-                if (elemento.data == 'comp'):
-                    self.visit(elemento)
-                elif (elemento.data == 'componente'):
-                    self.visit(elemento)
-                elif (elemento.data == 'interv'):
-                    self.visit(elemento)
+                self.visit(elemento)
             else:
+                id = elemento.value
+                self.HTML += "<span class='ciclo'> "+id+" </span>"
                 if (elemento.type=='ENQ'):
-                    id = elemento.value
-                    self.HTML += "<span class='ciclo'> "+id+" </span>"
-                elif (elemento.type=='FAZER'):
-                    id = elemento.value
-                    self.HTML += "<span class='ciclo'> "+id+" </span>"
-                elif (elemento.type=='END'):
-                    id = elemento.value
-                    self.HTML += "<span class='ciclo'> "+id+" </span> <br> <br>"
+                    self.pushEc("do")
                 elif (elemento.type == 'REPETIR'):
-                    id = elemento.value
-                    self.HTML += "<span class='ciclo'> "+id+" </span>"
-                elif (elemento.type == 'ATE'):
-                    id = elemento.value
-                    self.HTML += "<span class='ciclo'> "+id+" </span>"
+                    self.pushEc("while")
                 elif (elemento.type == 'PARA'):
-                    id = elemento.value
-                    self.HTML += "<span class='ciclo'> "+id+" </span>"
-
+                    self.pushEc("for")
+                elif (elemento.type=='END'):
+                    self.HTML += " <br> <br>"
+        self.popEc()
+                
     def retorno(self, tree):
         self.HTML += self.getTab()
         for elemento in tree.children:
             if (type(elemento) == Tree):
-                if (elemento.data == 'elemcomp'):
-                    self.visit(elemento)
+                self.visit(elemento)
             else:
+                id = elemento.value
                 if (elemento.type =='RET'):
-                    id = elemento.value
                     self.HTML += "<span class='retornos'> "+id+" </span>"
                 elif (elemento.type =='PVIR'):
-                    id = elemento.value
                     self.HTML += "<span class='code'> "+id+" </span> <br> <br>"
                 
     def comp(self,tree):
         for elemento in tree.children:
             if (type(elemento)==Tree):
+                t = self.visit(elemento)
                 if (elemento.data == 'sinalcomp'):
-                    t = self.visit(elemento)
                     self.HTML += "<span class='code'> "+t+" </span>"
-                elif (elemento.data == 'elemcomp'):
-                    self.visit(elemento)
             else:
-                if (elemento.type=='ID'):
-                    id = elemento.value
-                    if not self.checkDecl(id):
-                        print("Variavel "+id+" não declarada (2)")
-                        self.HTML += "<span class='naoDeclaracao'>!"+id+" </span>"
-                    else:
-                        self.setVar(id,'usada',True)
-                        self.HTML += "<span class='code'>!"+id+" </span>"
+                id = elemento.value
+                if not self.checkDecl(id):
+                    print("Variavel "+id+" não declarada (2)")
+                    self.HTML += "<span class='naoDeclaracao'>!"+id+" </span>"
+                else:
+                    self.setVar(id,'usada',True)
+                    self.HTML += "<span class='code'>!"+id+" </span>"
                         
     def sinalcomp(self, tree):
         for elemento in tree.children:
@@ -860,27 +883,20 @@ class MyInterpreter(Interpreter):
         self.HTML += self.getTab()
         for elemento in tree.children:
             if (type(elemento) == Tree):
+                self.visit(elemento)
                 if (elemento.data == 'elemcomp'):
-                    self.visit(elemento)
                     self.HTML += "<span class='code'> : { </span> <br> <br>"
-                    
-                elif (elemento.data == 'componente'):
-                    self.visit(elemento)
         self.HTML += self.getTab()[:-1] +"<span class='code'> } </span> <br> <br>"            
         
     def interv(self, tree):
         first = True
         self.HTML += "<span class='code'> [ </span>"
         for elemento in tree.children:
-            if (type(elemento)==Tree):
-                self.visit(elemento)
+            if first:
+                first = False
             else:
-                if(elemento.type=='NUM'):
-                    if first:
-                        first = False
-                    else:
-                        self.HTML += "<span class='code'>, </span>"
-                    self.HTML += "<span class='code'> " + elemento.value + " </span>"
+                self.HTML += "<span class='code'>, </span>"
+            self.HTML += "<span class='code'> " + elemento.value + " </span>"
         self.HTML += "<span class='code'> ] </span>"
         
     def elemcomp(self,tree):
@@ -913,7 +929,7 @@ class MyInterpreter(Interpreter):
                                         self.HTML += "<span class='naoInicializada'> " + id + " </span>"
                                     else:
                                         self.HTML += "<span class='code'> " + id + " </span>"
-                
+
                 elif (elemento.type=='NUM'):
                     num = elemento.value
                     self.HTML += "<span class='code'> " + num + " </span>"
@@ -979,9 +995,10 @@ class MyInterpreter(Interpreter):
                     self.HTML += "<span class='code'> false </span>"
         
 
-f = open('linguagem.txt', 'r')
+f = open('linguagem2.txt', 'r')
 frase = f.read()
 f.close()
+
 
 p = Lark(grammar)
 p = Lark(grammar)
