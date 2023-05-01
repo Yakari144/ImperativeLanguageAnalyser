@@ -1,7 +1,7 @@
 /* variavel sem atribuicao */
 int varInt;
 
-int
+int a;
 
 funcao(a, v);
 

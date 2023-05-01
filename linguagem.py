@@ -199,14 +199,6 @@ class MyInterpreter(Interpreter):
     def inEc(self):
         return self.ecAct() != None
 
-#"if1": {
-#    "do1": {
-#        "if2": {}
-#    }
-#}
-
-# c = [ 0, 1,  1,  0,  0,  1]
-
     def countEcAux(self,d):
         #     0 1   2   3   4   5
         #    cs cr csr css crr crs
@@ -275,68 +267,6 @@ class MyInterpreter(Interpreter):
                 s2 =  " "*(maxtipo-len(y['tipo']))
                 s = "\t\t"+y['nome']+s1+" : "+y['tipo']+s2+" : "+str(y['usada'])+" : "+str(y['atribuicao'])+" :"
                 print(s)
-    
-    def htmlInit(self):
-        self.HTML += ''' 
-        <!DOCTYPE html>
-        <html>
-        <style>
-            .error {
-                position: relative;
-                display: inline-block;
-                border-bottom: 1px dotted black;
-                color: red;
-            }
-            
-            .code {
-                position: relative;
-                display: inline-block;
-            }
-            
-            .error .errortext {
-                visibility: hidden;
-                width: 200px;
-                background-color: #555;
-                color: #fff;
-                text-align: center;
-                border-radius: 6px;
-                padding: 5px 0;
-                position: absolute;
-                z-index: 1;
-                bottom: 125%;
-                left: 50%;
-                margin-left: -40px;
-                opacity: 0;
-                transition: opacity 0.3s;
-            }
-
-            .error .errortext::after {
-                content: "";
-                position: absolute;
-                top: 100%;
-                left: 20%;
-                margin-left: -5px;
-                border-width: 5px;
-                border-style: solid;
-                border-color: #555 transparent transparent transparent;
-            }
-
-            .error:hover .errortext {
-                visibility: visible;
-                opacity: 1;
-            }
-        </style>
-        <body>
-            <h2>Análise de código</h2>
-            <pre><code>
-        '''
-    
-    def htmlEnd(self):
-        self.HTML += '''
-            </code></pre>
-        </body>
-        </html>
-        '''
     
     def writeHTML(self):
         f = open("output.html", "w")
@@ -1031,7 +961,7 @@ class MyInterpreter(Interpreter):
                     self.HTML += "<span class='code'> false </span>"
         
 
-f = open('linguagem2.txt', 'r')
+f = open('linguagem.txt', 'r')
 frase = f.read()
 f.close()
 
