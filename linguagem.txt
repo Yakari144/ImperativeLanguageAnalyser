@@ -1,6 +1,8 @@
 /* variavel sem atribuicao */
 int varInt;
 
+int
+
 funcao(a, v);
 
 int tetris = nabica;
@@ -39,7 +41,7 @@ lista variav2 = 1->"texto";
 
 /* funcao com retorno */
 def int funcao(string par1,tuplo par2){
-    int funcV;
+    int funcV = par1;
     string funcV2 = "texto";
     def string func4o2(int paulo){
         /* funcao sem retorno */
