@@ -3,9 +3,11 @@ int varInt;
 
 funcao(a, v);
 
-int tetris;
+int tetris = nabica;
 
 int camelo = 2+2;
+
+int varInt;
 
 int x = [2,3,4];
 
