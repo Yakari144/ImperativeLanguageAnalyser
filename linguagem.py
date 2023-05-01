@@ -199,6 +199,24 @@ class MyInterpreter(Interpreter):
     def inEc(self):
         return self.ecAct() != None
 
+    def countEcSE(self,d):
+        c = 0
+        for x in d.keys():
+            for a in ['if','case']:
+                if a in x:
+                    c+= 1
+            c += self.countEcSE(d[x])
+        return c
+    
+    def countEcREP(self,d):
+        c = 0
+        for x in d.keys():
+            for a in ['do','while','for']:
+                if a in x:
+                    c+= 1
+            c += self.countEcREP(d[x])
+        return c
+
     def countEcAux(self,d):
         #     0 1   2   3   4   5
         #    cs cr csr css crr crs
@@ -224,6 +242,10 @@ class MyInterpreter(Interpreter):
 
     def countEc(self):
         c = self.countEcAux(self.eC)
+        self.HTML += f"<tr><td><span>SE's dentro de SE's:</td><td>   {str(c[3])}</span></td></tr>"
+        self.HTML += f"<tr><td><span>SE's dentro de REP's:</td><td>  {str(c[5])}</span></td></tr>"
+        self.HTML += f"<tr><td><span>REP's dentro de SE's:</td><td>  {str(c[2])}</span></td></tr>"
+        self.HTML += f"<tr><td><span>REP's dentro de REP's:</td><td> {str(c[4])}</span></td></tr>"
         print("SE's dentro de SE's: " + str(c[3]))
         print("SE's dentro de REP's: " + str(c[5]))
         print("REP's dentro de SE's: " + str(c[2]))
@@ -393,7 +415,6 @@ class MyInterpreter(Interpreter):
     
     def htmlEnd(self):
         self.HTML += '''
-            </code></pre>
         </body>
         </html>
         '''
@@ -402,7 +423,6 @@ class MyInterpreter(Interpreter):
         f = open("output.html", "w")
         f.write(self.HTML)
 
-    
     def updateHTML(self):
         varsUnnused = []
         
@@ -414,8 +434,8 @@ class MyInterpreter(Interpreter):
                     else:
                         varsUnnused.append(x + "-" + y['nome'])
         
-        for t in varsUnnused:
-            print("Variável --> " + t + " não utilizada")
+        #for t in varsUnnused:
+        #    print("Variável --> " + t + " não utilizada")
         
         soup = BeautifulSoup(self.HTML, 'html.parser')
         
@@ -432,6 +452,7 @@ class MyInterpreter(Interpreter):
 #####################################################
 
     def __init__(self):
+        self.vars = [[],[],[],[]]
         self.variaveis = {}
         # create a stack to store the current function
         self.funcStack = []
@@ -446,17 +467,50 @@ class MyInterpreter(Interpreter):
         self.htmlInit()
         self.HTML += "<br>"
         self.visit_children(tree)
+        self.HTML +=f"""
+            </code></pre>
+            <h3>Variáveis</h3>
+            <table>
+            <tr>
+                <th>  </th><th>  </th>
+                </tr>
+                <tr><td><span>Variáveis já declaradas:</td><td> {str(len(self.vars[0]))}</span></td></tr>
+                <tr><td><span>Variáveis não declaradas:</td><td> {str(len(self.vars[1]))}</span></td></tr>
+                <tr><td><span>Variáveis não utilizadas:</td><td> {str(len(self.vars[2]))}</span></td></tr>
+                <tr><td><span>Variáveis não inicializadas:</td><td> {str(len(self.vars[3]))}</span></td></tr>
+                
+        """
+        print("Variáveis já declaradas: " + str(len(self.vars[0])))
+        print("Variáveis não declaradas: " + str(len(self.vars[1])))
+        print("Variáveis não utilizadas: " + str(len(self.vars[2])))
+        print("Variáveis não inicializadas: " + str(len(self.vars[3])))
+        tipos={}
+        for x in self.variaveis.keys():
+            for v in self.variaveis[x]:
+                if v['tipo'] in tipos.keys():
+                    tipos[v['tipo']] += 1
+                else:
+                    tipos[v['tipo']] = 1
+        t = 0
+        for x in tipos.keys():
+            t += tipos[x]
+            self.HTML += "<tr><td><span>Variáveis do tipo " + x + f":</td><td> {str(tipos[x])}</span></td></tr>"
+            print("Variáveis do tipo " + x + ": " + str(tipos[x]))
+            self.HTML += f"<tr><td><span>Total de variaveis:</td><td> {str(tipos[x])}</span></td></tr>"
+        print("Total de variáveis: " + str(t))
+        self.countEc()
+
         self.htmlEnd()
         self.updateHTML()
+        
         self.writeHTML()
-        self.countEc()
         # fim do programa
         self.printVars()
         # print the Selecao tree
-        print(json.dumps(self.eC, indent=4))
+        #print(json.dumps(self.eC, indent=4))
         
-        #for x in self.instructions.keys():
-        #    print("Instrucao "+ x + " : " + str(self.instructions[x]))
+        for x in self.instructions.keys():
+            print("Instrucao "+ x + " : " + str(self.instructions[x]))
     
     def componentes(self, tree):
         self.visit_children(tree)
@@ -506,7 +560,8 @@ class MyInterpreter(Interpreter):
         # print("Elementos visitados")
         # se a variavel esta declarada no contexto atual
         if self.checkDecl(id):
-            print("Variavel "+id+" ja declarada") 
+#            print("Variavel "+id+" ja declarada")
+            self.vars[0].append(str(self.funcAct()) +"-"+id) 
         # se a variavel nao esta declarada no contexto atual
         else:
             # se a funcao atual for nula, estamos no contexto global
@@ -541,7 +596,8 @@ class MyInterpreter(Interpreter):
                     self.HTML += "<span class='def'> " + t + " </span>"
         for var in self.variaveis[self.funcAct()]:
             if not var['usada']:
-                print("Variavel "+var['nome']+" na funcao "+self.funcAct()+" nao usada (3)")
+#                print("Variavel "+var['nome']+" na funcao "+self.funcAct()+" nao usada (3)")
+                self.vars[2].append(str(self.funcAct()) +"-"+var['nome'])
         self.popFunc()
         self.HTML += self.getTab() + "<span class='code'> } </span> <br> \n"
 
@@ -588,7 +644,8 @@ class MyInterpreter(Interpreter):
                     if i == 0:
                         i+=1
                         if not self.checkDecl(id):
-                            print("Variavel "+id+" não declarada (2)")
+#                            print("Variavel "+id+" não declarada (2)")
+                            self.vars[1].append(str(self.funcAct()) +"-"+id)
                             self.HTML += "<span class='naoDeclaracao id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
                         else:
                             if self.inFuncao():
@@ -596,7 +653,8 @@ class MyInterpreter(Interpreter):
                                     if x['nome'] == id:
                                         self.setVar(id,'usada',True)
                                         if x['atribuicao'] == False:
-                                            print("Variavel "+id+" não inicializada (4)")
+#                                            print("Variavel "+id+" não inicializada (4)")
+                                            self.vars[3].append(str(self.funcAct()) +"-"+id)
                                             self.HTML += "<span class='naoInicializada' id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
                                         else:
                                             self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
@@ -605,7 +663,8 @@ class MyInterpreter(Interpreter):
                                     if x['nome'] == id:
                                         self.setVar(id,'usada',True)
                                         if x['atribuicao'] == False:
-                                            print("Variavel "+id+" não inicializada (4)")
+#                                            print("Variavel "+id+" não inicializada (4)")
+                                            self.vars[3].append(str(self.funcAct()) +"-"+id)
                                             self.HTML += "<span class='naoInicializada' id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
                                         else:
                                             self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
@@ -659,11 +718,13 @@ class MyInterpreter(Interpreter):
                 if id not in [x['nome'] for x in self.variaveis[self.funcAct()]]:
                     self.variaveis[self.funcAct()].append({'nome':id,'tipo':t,'usada':False,'atribuicao':True})
                 else:
-                    print("Variavel "+id+" já declarada (1)")
+#                    print("Variavel "+id+" já declarada (1)")
+                    self.vars[0].append(self.funcAct() +"-"+id)
             else:
                 self.variaveis['GLOBAL'].append({'nome':id,'tipo':t,'usada':False,'atribuicao':True})
         else:
-            print("Variavel "+id+" já declarada (1)")
+#            print("Variavel "+id+" já declarada (1)")
+            self.vars[0].append(self.funcAct() +"-"+id)
             return
 
     def corpofunc(self, tree):
@@ -688,13 +749,16 @@ class MyInterpreter(Interpreter):
         if id not in [x['nome'] for x in self.variaveis['GLOBAL']]:
             if self.inFuncao():
                 if self.funcAct() not in self.variaveis.keys():
-                    print("Variavel "+id+" não declarada (2)")
+#                    print("Variavel "+id+" não declarada (2)")
+                    self.vars[1].append(str(self.funcAct()) +"-"+id)
                 elif id not in [x['nome'] for x in self.variaveis[self.funcAct()]]:
-                    print("Variavel "+id+" não declarada (2)")
+#                    print("Variavel "+id+" não declarada (2)")
+                    self.vars[1].append(str(self.funcAct()) +"-"+id)
                 else:
                     self.setVar(id,'atribuicao',True)
             else:
-                print("Variavel "+id+" não declarada (2)")
+#                print("Variavel "+id+" não declarada (2)")
+                self.vars[1].append(str(self.funcAct()) +"-"+id)
         else:
             self.setVar(id,'atribuicao',True)
 
@@ -707,7 +771,8 @@ class MyInterpreter(Interpreter):
                 if (elemento.type=='ID'):
                     id = elemento.value
                     if not self.checkDecl(id):
-                        print("Variavel "+id+" não declarada (2)")
+#                        print("Variavel "+id+" não declarada (2)")
+                        self.vars[1].append(str(self.funcAct()) +"-"+id)
                         self.HTML += "<span class='naoDeclaracao'>, "+id+" ) </span>"
                     else:
                         self.setVar(id,'atribuicao',True) 
@@ -725,7 +790,8 @@ class MyInterpreter(Interpreter):
                 if (elemento.type=='ID'):
                     id = elemento.value
                     if not self.checkDecl(id):
-                        print("Variavel "+id+" não declarada (2)")
+#                        print("Variavel "+id+" não declarada (2)")
+                        self.vars[1].append(str(self.funcAct()) +"-"+id)
                         self.HTML += "<span class='naoDeclaracao'>, "+id+" ) </span>"
                     else:
                         self.setVar(id,'atribuicao',True)
@@ -765,7 +831,8 @@ class MyInterpreter(Interpreter):
                 t = elemento.value
                 if (elemento.type=='ID'):
                     if not self.checkDecl(t):
-                        print("Variavel "+t+" não declarada (2)")
+#                        print("Variavel "+t+" não declarada (2)")
+                        self.vars[1].append(self.funcAct() +"-"+t)
                         self.HTML += "<span class='naoDeclaracao'> "+t+" </span>"
                     else:
                         self.setVar(t,'usada',True)
@@ -835,7 +902,8 @@ class MyInterpreter(Interpreter):
             else:
                 id = elemento.value
                 if not self.checkDecl(id):
-                    print("Variavel "+id+" não declarada (2)")
+#                    print("Variavel "+id+" não declarada (2)")
+                    self.vars[1].append(str(self.funcAct()) +"-"+id)
                     self.HTML += "<span class='naoDeclaracao'>!"+id+" </span>"
                 else:
                     self.setVar(id,'usada',True)
@@ -873,7 +941,8 @@ class MyInterpreter(Interpreter):
                 if (elemento.type=='ID'):
                     id = elemento.value
                     if not self.checkDecl(id):
-                        print("Variavel "+id+" não declarada (2)")
+#                        print("Variavel "+id+" não declarada (2)")
+                        self.vars[1].append(str(self.funcAct()) +"-"+id)
                         self.HTML += "<span class='naoDeclaracao'> " + id + " </span>"
                     else:
                         if self.inFuncao():
@@ -882,7 +951,8 @@ class MyInterpreter(Interpreter):
                                     # colocar a variavel como usada
                                     self.setVar(id,'usada',True)
                                     if x['atribuicao'] == False:
-                                        print("Variavel "+id+" não inicializada (4)")
+#                                        print("Variavel "+id+" não inicializada (4)")
+                                        self.vars[3].append(str(self.funcAct()) +"-"+id)
                                         self.HTML += "<span class='naoInicializada'> " + id + " </span>"
                                     else:
                                         self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'> " + id + " </span>"
@@ -891,7 +961,8 @@ class MyInterpreter(Interpreter):
                                 if x['nome'] == id:
                                     self.setVar(id,'usada',True)
                                     if x['atribuicao'] == False:
-                                        print("Variavel "+id+" não inicializada (4)")
+#                                        print("Variavel "+id+" não inicializada (4)")
+                                        self.vars[3].append(str(self.funcAct()) +"-"+id)
                                         self.HTML += "<span class='naoInicializada'> " + id + " </span>"
                                     else:
                                         self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'> " + id + " </span>"
