@@ -469,7 +469,7 @@ class MyInterpreter(Interpreter):
         self.visit_children(tree)
         self.HTML +=f"""
             </code></pre>
-            <h3>Variáveis</h3>
+            <h3>Estatisticas</h3>
             <table>
             <tr>
                 <th>  </th><th>  </th>
