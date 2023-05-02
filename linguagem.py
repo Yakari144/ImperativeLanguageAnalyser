@@ -490,13 +490,14 @@ class MyInterpreter(Interpreter):
                 if v['tipo'] in tipos.keys():
                     tipos[v['tipo']] += 1
                 else:
+                    print(v['tipo'])
                     tipos[v['tipo']] = 1
         t = 0
         for x in tipos.keys():
             t += tipos[x]
             self.HTML += "<tr><td><span>Variáveis do tipo " + x + f":</td><td> {str(tipos[x])}</span></td></tr>"
             print("Variáveis do tipo " + x + ": " + str(tipos[x]))
-            self.HTML += f"<tr><td><span>Total de variaveis:</td><td> {str(tipos[x])}</span></td></tr>"
+        self.HTML += f"<tr><td><span>Total de variaveis:</td><td> {str(t)}</span></td></tr>"
         print("Total de variáveis: " + str(t))
         self.countEc()
 

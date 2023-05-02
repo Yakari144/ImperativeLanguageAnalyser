@@ -61,7 +61,7 @@ ler(ficheiro.txt,var);
 /* escrita */
 escrever(ficheiro,var);
 
-int teste;
+string teste;
 
 /* selecao if */
 se 1 == 1 {
