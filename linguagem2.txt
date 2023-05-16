@@ -1,32 +1,24 @@
-int queCenaMeu=1;
-
-
-/* selecao if */
-se 1 == 1 {
-    
-}
-
-
-
-/* repeticao enq */
-    enquanto 1 >= 1 
-    fazer 
-        f();
-    end
-    
-/* selecao if */
-se 1 == 1 {/* repeticao enq */
-    enquanto 1 >= 1 
-    fazer 
-    /* selecao if */
-se 1 == 1 {
-    
-/* repeticao enq */
-    enquanto 1 >= 1 
-    fazer 
-        f();
-    end
-}
-    end
-} 
-    
+/* variavel sem atribuicao */  
+ string  varInt  ;  
+ 
+ int  a  ;  
+ 
+ a = 2  *  4  ;  
+ 
+ funcao  ( a ,  v  )  ;  
+ 
+ int a  =  2  ;  
+ 
+ def  int  myTeste  (  int par2  )  {  
+ 
+     string  funcV2  =  "texto"  ;  
+ 
+     devolve  funcV2  ;  
+ 
+ }  
+ 
+ int  tetris  =  2  *  2  ;  
+ 
+ int  b  ;  
+ 
+ myTeste  ( b  )  ;

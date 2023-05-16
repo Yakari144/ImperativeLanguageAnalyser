@@ -1033,7 +1033,7 @@ class MyInterpreter(Interpreter):
                     self.HTML += "<span class='code'> false </span>"
         
 
-f = open('linguagem.txt', 'r')
+f = open('linguagem2.txt', 'r')
 frase = f.read()
 f.close()
 
