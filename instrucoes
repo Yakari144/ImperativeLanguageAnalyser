@@ -1,0 +1,19 @@
+0:  string varInt  ;  
+1:  bool funcV2  ;  
+2:  tuplo a  ;  
+3:  int a = 2 * 4    ;  
+4: myTeste2( a   ,  v   ,  funcV2   )   ;  
+ def  int  myTeste(  int par2   ) {
+5:  string funcV2 = \"texto\"    ;  
+6:  array teste = [ ]    ;  
+7: devolve funcV2  ; 
+}
+ 8:  int tetris = 2 * 2    ;  
+9:  int b  ;  
+ def  array  myTeste2(  int par   ) {
+10:  array teste2 = [ ]    ;  
+11: devolve teste  ; 
+}
+ 12: myTeste( b   )   ;  
+18: SAIR_SE
+23: SAIR_SE

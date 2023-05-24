@@ -10,16 +10,17 @@ grammar = r'''
 //Regras Sintaticas
 start: componentes
 componentes: (componente|deffuncao)*
-componente: declaracao | COMENTARIO | instrucao 
-declaracao: tipo ID ( "=" ecomp )? PVIR    
+componente: COMENTARIO | instrucao   
 deffuncao: DEF tipo ID "(" params? ")" corpofunc
 funcao: ID "(" (ecomp("," ecomp)*)? ")"
 instrucao : atribuicao PVIR
         | leitura PVIR
         | escrita PVIR
+        | declaracao PVIR
         | selecao
         | repeticao
         | funcao PVIR
+declaracao: tipo ID ( "=" ecomp )? 
 tipo : INT
     | BOOLEAN
     | STRING
@@ -29,8 +30,8 @@ tipo : INT
 ecomp: exp|elemcomp
 exp: NUM op NUM
     | ID "[" NUM "]"
-    | ID "." oplist
-    | ID "." ID
+    | ID DOT oplist
+    | ID DOT ID
 op :  ADD
     | SUB
     | DIV
@@ -45,12 +46,13 @@ oplist : CONS
 params: param (VIR param)*
 param: tipo ID
 corpofunc: "{" (componente|deffuncao|retorno)* "}"
-atribuicao: ID "=" (ecomp)
+atribuicao: ID "=" ecomp
 leitura: LER "(" ficheiro "," ID ")"
 escrita: ESCREVER "(" ficheiro "," ID ")"
-ficheiro: ID ("." ID)?
-selecao: SE comp "{" (declaracao|COMENTARIO|instrucao)* "}"
+ficheiro: ID (DOT ID)?
+selecao: SE comp "{" (COMENTARIO|instrucao)* "}" senao?
         | CASO ID caso+ END
+senao: SENAO "{" (COMENTARIO|instrucao)* "}"
 repeticao: ENQ comp FAZER componente+ END
         | REPETIR componente+ ATE comp END
         | PARA interv FAZER componente+ END
@@ -108,6 +110,7 @@ VIR: ","
 LER: "ler"
 ESCREVER: "escrever"
 SE: "se"
+SENAO: "senao"
 CASO: "caso"
 ENQ: "enquanto"
 FAZER: "fazer"
@@ -123,6 +126,7 @@ DIF : "!="
 LESS : "<"
 G : ">"
 STR: /"(\\\"|[^"])*"/
+DOT: "."
 //Tratamento dos espaços em branco
 %import common.WS
 %ignore WS
@@ -444,9 +448,7 @@ class MyInterpreter(Interpreter):
             for x in soup.find_all('span', id=var):
                 x['class'] = 'naoUsada'
             self.HTML = str(soup)
-        
-        
-        
+           
 #####################################################
 ################ Interpreter methods ################
 #####################################################
@@ -454,12 +456,23 @@ class MyInterpreter(Interpreter):
     def __init__(self):
         self.vars = [[],[],[],[]]
         self.variaveis = {}
+        '''
+        Variaveis:
+            GLOBAL
+                */  nome   : tipo   : usada : atribuicao : */
+            nome_funcao
+                    argumentos  : int    : False : True :
+                    variaveis   : array  : False : True :
+        '''
         # create a stack to store the current function
         self.funcStack = []
         self.instructions = {}
         self.HTML = ""
         self.eC = {}
         self.ecStack = []
+        self.cfg = "digraph G {\n"
+        self.cfgAnt = ""
+        self.instC = 0
 
     def start(self, tree):
         self.variaveis['GLOBAL'] = []
@@ -467,6 +480,10 @@ class MyInterpreter(Interpreter):
         self.htmlInit()
         self.HTML += "<br>"
         self.visit_children(tree)
+        self.cfg+="}\n"
+        with open("cfg.dot", "w") as f:
+            f.write(self.cfg)
+            f.close()
         self.HTML +=f"""
             </code></pre>
             <h3>Estatisticas</h3>
@@ -490,7 +507,6 @@ class MyInterpreter(Interpreter):
                 if v['tipo'] in tipos.keys():
                     tipos[v['tipo']] += 1
                 else:
-                    print(v['tipo'])
                     tipos[v['tipo']] = 1
         t = 0
         for x in tipos.keys():
@@ -514,19 +530,27 @@ class MyInterpreter(Interpreter):
             print("Instrucao "+ x + " : " + str(self.instructions[x]))
     
     def componentes(self, tree):
-        self.visit_children(tree)
+        retorno =""
+        for elemento in tree.children:
+            if (type(elemento)==Tree):
+                retorno += self.visit(elemento)
+        with open("instrucoes", "w") as f:
+            f.write(retorno)
     
     def componente(self, tree):
+        retorno =""
         for elemento in tree.children:
             self.HTML += self.getTab()
             if(type(elemento) == Tree):
-                self.visit(elemento)
+                retorno += self.visit(elemento)
             else:
                 if (elemento.type=='COMENTARIO'):
                     comentario = elemento.value
                     self.HTML += "<span class='code'> "+comentario+" </span> <br>"
+        return retorno
             
     def declaracao(self, tree):
+        retorno =""
         atr=False
         for elemento in tree.children:
             # simbolo nao terminal
@@ -535,33 +559,31 @@ class MyInterpreter(Interpreter):
                 if( elemento.data == 'tipo'):
                     # obter o valor do nao terminal (return da funcao "tipo(self,tree)")
                     t = self.visit(elemento)
+                    retorno +=" "+ t + " "
                     self.HTML += "<span class='code'> "+t+" </span>"
-                else :
-                    if (elemento.data == 'ecomp'):
-                        atr = True
-                        if 'atribuicao' not in self.instructions.keys():
-                            self.instructions['atribuicao'] = 1
-                        else:
-                            self.instructions['atribuicao'] += 1
-                        self.HTML += "<span class='code'> = </span>"
-                    self.visit(elemento)
+                elif (elemento.data == 'ecomp'):
+                    atr = True
+                    if 'atribuicao' not in self.instructions.keys():
+                        self.instructions['atribuicao'] = 1
+                    else:
+                        self.instructions['atribuicao'] += 1
+                    self.HTML += "<span class='code'> = </span>"
+                    retorno += " = "
+                    retorno += self.visit(elemento)
             else:
                 # simbolo terminal 'ID' na gramatica
                 if (elemento.type=='ID'):
                     # obter o valor do terminal
                     id = elemento.value
+                    retorno += id
                     if self.checkDecl(id):
                         self.HTML += "<span class='redeclaracao' id ='"+ str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
                     else:
                         self.HTML += "<span class='code' id ='"+ str(self.funcAct()) + "-" + id +"'> " + id + " </span>"
-                elif (elemento.type=='PVIR'):
-                    self.HTML += "<span class='code'> ; </span> <br> <br>"
-                    
-                    
-        # print("Elementos visitados")
+
+          
         # se a variavel esta declarada no contexto atual
         if self.checkDecl(id):
-#            print("Variavel "+id+" ja declarada")
             self.vars[0].append(str(self.funcAct()) +"-"+id) 
         # se a variavel nao esta declarada no contexto atual
         else:
@@ -571,77 +593,114 @@ class MyInterpreter(Interpreter):
             # se a funcao atual nao for nula, estamos no contexto de uma funcao
             else:
                 self.variaveis[self.funcAct()].append({'nome':id,'tipo':t,'usada':False,'atribuicao':atr})
+        return retorno
 
     def deffuncao(self,tree):
+        retorno = "" 
+        ant = self.cfgAnt
         self.HTML += self.getTab()
         for elemento in tree.children:
             if (type(elemento) == Tree):
+                t = self.visit(elemento)
                 if (elemento.data == 'tipo'):
-                    t = self.visit(elemento)
                     self.HTML += "<span class='code'> " + t + " </span>"
-                
-                elif (elemento.data == 'params'):
-                    t = self.visit(elemento)
-                
                 elif (elemento.data == 'corpofunc'):
-                    t = self.visit(elemento)
-                    
+                    retorno += ")" 
+                retorno += " "+ t + " "
             else:
+                t = elemento.value
                 if (elemento.type == 'ID'):
-                    self.pushFunc(elemento.value)
-                    t = elemento.value
+                    self.pushFunc(t)
                     self.HTML += "<span class='funcName'> " + t + "</span> <span class='code'> ( </span>"
-                    
+                    retorno += " "+ t + "(" + " "
+                    self.cfgAnt = "Entry_"+t
                 elif (elemento.type == 'DEF'):
-                    t = elemento.value
+                    retorno += " "+ t + " "
                     self.HTML += "<span class='def'> " + t + " </span>"
         for var in self.variaveis[self.funcAct()]:
             if not var['usada']:
 #                print("Variavel "+var['nome']+" na funcao "+self.funcAct()+" nao usada (3)")
                 self.vars[2].append(str(self.funcAct()) +"-"+var['nome'])
-        self.popFunc()
         self.HTML += self.getTab() + "<span class='code'> } </span> <br> \n"
-
+        if self.cfgAnt != "":
+            self.cfg += '"'+ self.cfgAnt + "\" -> " + "Exit_"+self.funcAct() + "\n"
+        self.cfgAnt = ant
+        self.popFunc()
+        return retorno
+ 
+    def funcao(self,tree):
+        first = True;
+        retorno = "" 
+        for elemento in tree.children:
+            if (type(elemento) == Tree):
+                if (first):
+                    first = False
+                else:
+                    self.HTML += "<span class='code'>, </span>"
+                    retorno += ", " + " "
+                retorno += self.visit(elemento) + " "
+            else: 
+                if (elemento.type == 'ID'):
+                    id = elemento.value     
+                    retorno += id +"(" + " "
+                    self.HTML += "<span class='funcName' id ='"+ str(self.funcAct()) + "-" + id +"'> " + id + " </span> <span class='code'>(</span>"
+        self.HTML += "<span class='code'> ) </span>" 
+        retorno += ")" + " "
+        return retorno
+        
     def instrucao(self, tree):
+        retorno = str(self.instC) +": " 
         for elemento in tree.children:
             if (type(elemento)==Tree):
                 if elemento.data not in self.instructions.keys():
                     self.instructions[elemento.data] = 1
                 else :
                     self.instructions[elemento.data] += 1
-                self.visit(elemento)
+                if elemento.data=='selecao':
+                    self.visit(elemento)
+                    retorno = self.cfgAnt
+                    self.cfgAnt = ""
+                else:
+                    retorno += self.visit(elemento) + " "
             else:
                 if (elemento.type == 'PVIR'):
                     self.HTML += "<span class='code'> ; </span> <br> <br>"
+                    retorno += " ; " + " "
+        if self.cfgAnt != "":
+            self.cfg+= '"'+self.cfgAnt + '" -> "' + retorno + '"\n'
+        self.cfgAnt = retorno
+        retorno+="\n"
+        self.instC += 1
+        return retorno
 
     def tipo(self, tree):
         for elemento in tree.children:
             return elemento.value
 
     def ecomp(self,tree):
-        self.visit_children(tree)
+        retorno = "" 
+        retorno += self.visit(tree.children[0]) + " "
+        return retorno
 
     def exp(self,tree):
+        retorno = "" 
         i = 0
         firstEntry = 0
         firstElement = ""
         for elemento in tree.children:
             if (type(elemento)==Tree):
-                if( elemento.data == 'op'):
-                    # obter o valor do nao terminal (return da funcao "tipo(self,tree)")
-                    t = self.visit(elemento)
-                    self.HTML += "<span class='code'> "+t+" </span>"
-                elif (elemento.data == 'oplist'):
-                    t = self.visit(elemento)
-                    self.HTML += "<span class='code'> "+t+" </span>"
+                t = self.visit(elemento)
+                retorno += t + " "
+                self.HTML += "<span class='code'> "+t+" </span>"
             else:
                 if (elemento.type=='ID'):
+                    id = elemento.value
+                    retorno += id + " "
                     if (firstEntry == 0):
-                        firstEntry = 1
                         firstElement = "ID"
+                        firstEntry = 1
                     else:
                         firstEntry = 2
-                    id = elemento.value
                     if i == 0:
                         i+=1
                         if not self.checkDecl(id):
@@ -678,10 +737,15 @@ class MyInterpreter(Interpreter):
                         
                     if firstElement == "NUM":
                         num = elemento.value
+                        retorno += num + " "
                         self.HTML += "<span class='code'> "+num+" </span>"
                     else:
                         num = elemento.value
+                        retorno += "["+num+"]" + " "
                         self.HTML += "<span class='code'>[ "+num+" ]</span>"
+                elif (elemento.type == 'DOT'):
+                    retorno += elemento.value + " "
+        return retorno
 
     def op(self, tree):
         for elemento in tree.children:
@@ -692,23 +756,29 @@ class MyInterpreter(Interpreter):
             return elemento.value
 
     def params(self, tree):
+        retorno = "" 
         for elemento in tree.children:
             if (type(elemento) == Tree):
                 if (elemento.data == 'param'):
-                    self.visit(elemento)
+                    retorno += self.visit(elemento) + " "
             else:
                 if (elemento.type == 'VIR'):
                     self.HTML += "<span class='code'>, </span>"
+                    retorno += ", " + " "
+        return retorno
 
     def param(self, tree):
+        retorno = "" 
         for elemento in tree.children:
             if (type(elemento) == Tree):
                 if (elemento.data == 'tipo'):
                     t = self.visit(elemento)
+                    retorno += t + " "
                     self.HTML += "<span class='code'> " + t + " </span>"
             else:
                 if (elemento.type == 'ID'):
                     id = elemento.value
+                    retorno += id + " "
                     self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
         # print("Elementos visitados, vou regressar à main()")
         # print("Elementos visitados, vou regressar à main()")
@@ -726,26 +796,26 @@ class MyInterpreter(Interpreter):
         else:
 #            print("Variavel "+id+" já declarada (1)")
             self.vars[0].append(self.funcAct() +"-"+id)
-            return
+        return retorno
 
     def corpofunc(self, tree):
+        retorno = "{\n"
         self.HTML += "<span class='code'> ) </span><span class='code'> { </span> <br> <br>"
         for elemento in tree.children:
             if (type(elemento)==Tree):
-                if(elemento.data == 'componente'):
-                    self.visit(elemento)
-                elif(elemento.data == 'deffuncao'):
-                    self.visit(elemento)
-                elif(elemento.data == 'retorno'):
-                    self.visit(elemento)
+                retorno += self.visit(elemento)
+        retorno += "}\n"
+        return retorno
 
     def atribuicao(self, tree):
+        retorno = "" 
         for elemento in tree.children:
             if (type(elemento)==Tree):
-                self.visit(elemento)
+                retorno += self.visit(elemento) + " "
             else:
                 if (elemento.type == 'ID'):
                     id = elemento.value
+                    retorno += id + " = " + " "
                     self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
         if id not in [x['nome'] for x in self.variaveis['GLOBAL']]:
             if self.inFuncao():
@@ -762,15 +832,18 @@ class MyInterpreter(Interpreter):
                 self.vars[1].append(str(self.funcAct()) +"-"+id)
         else:
             self.setVar(id,'atribuicao',True)
+        return retorno
 
     def leitura(self,tree):
+        retorno = "" 
         for elemento in tree.children:
             if (type(elemento)==Tree):
                 if (elemento.data == 'ficheiro'):
-                    self.visit(elemento)
+                    retorno += self.visit(elemento) +"," + " "
             else:
                 if (elemento.type=='ID'):
                     id = elemento.value
+                    retorno += id +")" + " "
                     if not self.checkDecl(id):
 #                        print("Variavel "+id+" não declarada (2)")
                         self.vars[1].append(str(self.funcAct()) +"-"+id)
@@ -781,12 +854,15 @@ class MyInterpreter(Interpreter):
                 if (elemento.type=='LER'):
                     t = elemento.value
                     self.HTML += "<span class='code'>" + t + " ( </span>"
+                    retorno += t + " (" + " "
+        return retorno
                     
     def escrita(self,tree):
+        retorno = "" 
         for elemento in tree.children:
             if (type(elemento)==Tree):
                 if (elemento.data == 'ficheiro'):
-                    self.visit(elemento)
+                    retorno += self.visit(elemento) + ", " + " "
             else:
                 if (elemento.type=='ID'):
                     id = elemento.value
@@ -797,42 +873,67 @@ class MyInterpreter(Interpreter):
                     else:
                         self.setVar(id,'atribuicao',True)
                         self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'>," + id + " ) </span>"
+                    retorno += id + " )" + " "
                 if (elemento.type=='ESCREVER'):
                     t = elemento.value
                     self.HTML += "<span class='code'>" + t + " ( </span>"
+                    retorno += t + " (" + " "
+        return retorno
     
     def ficheiro(self, tree):
         first = True
         for elemento in tree.children:
             if(type(elemento)==Tree):
-                self.visit(elemento)
+                retorno += self.visit(elemento) + " "
             else:
                 if(elemento.type=='ID'):
+                    id = elemento.value
+                    retorno += id + " "
                     if first:
-                        id = elemento.value
                         first = False
                         self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
                     else:
-                        id = elemento.value
                         self.HTML += "<span class='code' >."+id+" </span>"
-
+                elif(elemento.type=='DOT'):
+                    retorno += elemento.value + " "
+        return retorno
+                
     def selecao(self,tree):
+        retorno = str(self.instC)+": " 
+        self.instC += 1
         se = False
+        senao = False
         c = 0
+        ant = ""
+        inicioIF = ""
         for elemento in tree.children:
             t = ""
             if (type(elemento)==Tree):
-                
-                if (elemento.data != 'comp') and se:
-                    self.HTML += self.getTab()
-                self.visit(elemento)
-                if (elemento.data == 'comp'):
+                if (elemento.data == 'comp') and se:
+                    retorno += self.visit(elemento) + " "
+                    self.cfg+= '"'+self.cfgAnt + '" -> "' + retorno + '"\n'
+                    inicioIF = retorno
+                    entao = str(self.instC)+": ENTAO"
+                    self.instC += 1
+                    self.cfg+= '"'+retorno + '" -> "'+entao +'"\n'
+                    self.cfgAnt = entao
+                    retorno += " {\n"
                     self.HTML += "<span class='code'> { </span> <br> <br>"
+                elif (elemento.data == 'senao'):
+                    ant = self.cfgAnt
+                    self.cfgAnt = inicioIF
+                    self.visit(elemento)
+                    senao = True
+                elif (elemento.data == 'caso'):
+                    retorno += self.visit(elemento) + " "
+                else:
+                    self.HTML += self.getTab()
+                    self.visit(elemento)
             else:
                 t = elemento.value
+                retorno += t + " "
                 if (elemento.type=='ID'):
                     if not self.checkDecl(t):
-#                        print("Variavel "+t+" não declarada (2)")
                         self.vars[1].append(self.funcAct() +"-"+t)
                         self.HTML += "<span class='naoDeclaracao'> "+t+" </span>"
                     else:
@@ -854,7 +955,16 @@ class MyInterpreter(Interpreter):
                     c +=1
                     comentario = elemento.value
                     self.HTML += self.getTab() +"<span class='code'> "+comentario+" </span> <br>"
-        if se:             
+        if se: 
+            ex = str(self.instC)+": SAIR_SE"
+            self.instC += 1
+            self.cfg+= '"'+self.cfgAnt + '" -> "' + ex + '"\n'
+            if senao:
+                self.cfg+= '"'+ant + '" -> "' + ex + '"\n'
+            else:
+                self.cfg+= '"'+inicioIF + '" -> "' + ex + '"\n'
+            self.cfgAnt = ex
+            retorno += "}"
             self.HTML += self.getTab()[:-1]+ "<span class='code'> } </span> <br> <br>"
         
         if len(tree.children) == 2:
@@ -864,13 +974,33 @@ class MyInterpreter(Interpreter):
             if type(v)==dict and len(v.keys())==1 and 'if' in list(v.keys())[0]:
                         print("Selecao "+ self.ecAct()+" é IF com IF aninhado e de possivel junção.")
         self.popEc()
+        return retorno
 
-    def repeticao(self, tree):
+    def senao(self,tree):
+        newIt = str(self.instC)+": SENAO "
+        self.instC += 1
+        self.cfg+= '"'+self.cfgAnt + '" -> "' + newIt + '"\n'
+        self.cfgAnt = newIt
         for elemento in tree.children:
-            if (type(elemento) == Tree):
+            if (type(elemento)==Tree):
                 self.visit(elemento)
             else:
+                t = elemento.value
+                if (elemento.type=='SENAO'):
+                    self.HTML += "<span class='ciclo'> "+t+" </span>"
+                elif (elemento.type == 'COMENTARIO'):
+                    c +=1
+                    comentario = elemento.value
+                    self.HTML += self.getTab() +"<span class='code'> "+comentario+" </span> <br>"
+        
+    def repeticao(self, tree):
+        retorno = "" 
+        for elemento in tree.children:
+            if (type(elemento) == Tree):
+                retorno += self.visit(elemento) + " "
+            else:
                 id = elemento.value
+                retorno += id + " "
                 self.HTML += "<span class='ciclo'> "+id+" </span>"
                 if (elemento.type=='ENQ'):
                     self.pushEc("do")
@@ -881,27 +1011,38 @@ class MyInterpreter(Interpreter):
                 elif (elemento.type=='END'):
                     self.HTML += " <br> <br>"
         self.popEc()
+        return retorno
                 
     def retorno(self, tree):
+        retorno = str(self.instC) +": " 
+        self.instC += 1
         self.HTML += self.getTab()
         for elemento in tree.children:
             if (type(elemento) == Tree):
-                self.visit(elemento)
+                retorno += self.visit(elemento) + " "
             else:
                 id = elemento.value
+                retorno += id + " "
                 if (elemento.type =='RET'):
                     self.HTML += "<span class='retornos'> "+id+" </span>"
                 elif (elemento.type =='PVIR'):
                     self.HTML += "<span class='code'> "+id+" </span> <br> <br>"
+        self.cfg += "\""+ self.cfgAnt + "\" -> \"" + retorno + "\"\n"
+        self.cfg += "\""+ retorno + "\" -> \"" + "Exit_"+self.funcAct() + "\"\n"
+        self.cfgAnt = ''
+        return retorno+"\n"
                 
     def comp(self,tree):
+        retorno = "" 
         for elemento in tree.children:
             if (type(elemento)==Tree):
                 t = self.visit(elemento)
+                retorno += t + " "
                 if (elemento.data == 'sinalcomp'):
                     self.HTML += "<span class='code'> "+t+" </span>"
             else:
                 id = elemento.value
+                retorno += "!"+id + " "
                 if not self.checkDecl(id):
 #                    print("Variavel "+id+" não declarada (2)")
                     self.vars[1].append(str(self.funcAct()) +"-"+id)
@@ -909,21 +1050,26 @@ class MyInterpreter(Interpreter):
                 else:
                     self.setVar(id,'usada',True)
                     self.HTML += "<span class='code'>!"+id+" </span>"
+        return retorno
                         
     def sinalcomp(self, tree):
         for elemento in tree.children:
             return elemento.value
 
     def caso(self,tree):
+        retorno = "" 
         self.HTML += self.getTab()
         for elemento in tree.children:
             if (type(elemento) == Tree):
-                self.visit(elemento)
+                retorno += self.visit(elemento) + " "
                 if (elemento.data == 'elemcomp'):
+                    retorno += ": {" + " "
                     self.HTML += "<span class='code'> : { </span> <br> <br>"
-        self.HTML += self.getTab()[:-1] +"<span class='code'> } </span> <br> <br>"            
+        self.HTML += self.getTab()[:-1] +"<span class='code'> } </span> <br> <br>"
+        return retorno + " }"            
         
     def interv(self, tree):
+        retorno = "[" + " "
         first = True
         self.HTML += "<span class='code'> [ </span>"
         for elemento in tree.children:
@@ -932,15 +1078,19 @@ class MyInterpreter(Interpreter):
             else:
                 self.HTML += "<span class='code'>, </span>"
             self.HTML += "<span class='code'> " + elemento.value + " </span>"
+            retorno += elemento.value + " "
         self.HTML += "<span class='code'> ] </span>"
+        return retorno + "]"
         
     def elemcomp(self,tree):
+        retorno = "" 
         for elemento in tree.children:
             if (type(elemento)==Tree):
-                self.visit(elemento)
+                retorno += self.visit(elemento) + " "
             else:
                 if (elemento.type=='ID'):
                     id = elemento.value
+                    retorno += id + " "
                     if not self.checkDecl(id):
 #                        print("Variavel "+id+" não declarada (2)")
                         self.vars[1].append(str(self.funcAct()) +"-"+id)
@@ -970,67 +1120,68 @@ class MyInterpreter(Interpreter):
                 
                 elif (elemento.type=='NUM'):
                     num = elemento.value
+                    retorno += num + " "
                     self.HTML += "<span class='code'> " + num + " </span>"
+
                 elif (elemento.type == 'STR'):
                     t = elemento.value
+                    t = t.replace('"',r'\"')
+                    retorno += t + " "
                     self.HTML += "<span class='code'> " + t + " </span>"
-                
-    def funcao(self,tree):
-        first = True;
-        for elemento in tree.children:
-            if (type(elemento) == Tree):
-                if (first):
-                    self.visit(elemento)
-                    first = False
-                else:
-                    self.HTML += "<span class='code'>, </span>"
-                    self.visit(elemento)
-            else: 
-                if (elemento.type == 'ID'):
-                    id = elemento.value     
-                    self.HTML += "<span class='funcName' id ='"+ str(self.funcAct()) + "-" + id +"'> " + id + " </span> <span class='code'>(</span>"
-        self.HTML += "<span class='code'> ) </span>" 
+        
+        return retorno
         
     def array(self,tree):
+        retorno = "[" + " "
         self.HTML += "<span class='code'> [ </span>"
         for elemento in tree.children:
             if (type(elemento)==Tree):
-                self.visit(elemento)
+                retorno += self.visit(elemento) + " "
             else :
                 if (elemento.type=='VIR'):
-                    num = elemento.value
                     self.HTML += "<span class='code'>, </span>"
+                    retorno += ", " + " "
         self.HTML += "<span class='code'> ] </span>"
+        return retorno + "]"
         
     def tuplo(self,tree):
+        retorno = "(" + " "
         self.HTML += "<span class='code'> ( </span>"
         for elemento in tree.children:
             if (type(elemento)==Tree):
                 self.visit(elemento)
             else :
                 if (elemento.type=='VIR'):
-                    num = elemento.value
+                    retorno += ", " + " "
                     self.HTML += "<span class='code'>, </span>"
         self.HTML += "<span class='code'> ) </span>"
-
+        return retorno + ")"
+    
     def lista(self,tree):
+        retorno = "" 
         first = True
         for elemento in tree.children:
             if (type(elemento)==Tree):
-                self.visit(elemento)
+                retorno += self.visit(elemento) + " "
                 if first:
                     self.HTML += "<span class='code'> -> </span>"
+                    retorno += " -> " + " "
                     first = False
-
+        return retorno
+    
     def bool(self,tree):
+        retorno = "" 
         for elemento in tree.children:
             if (type(elemento)==Tree):
-                self.visit(elemento)
+                retorno += self.visit(elemento) + " "
             else:
                 if(elemento.type == 'TRUE'):
+                    retorno += "true" + " "
                     self.HTML += "<span class='code'> true </span>"
                 elif (elemento.type == 'FALSE'):
+                    retorno += "false" + " "
                     self.HTML += "<span class='code'> false </span>"
+        return retorno
         
 
 f = open('linguagem2.txt', 'r')

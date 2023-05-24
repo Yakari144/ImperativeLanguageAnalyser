@@ -1,24 +1,41 @@
-/* variavel sem atribuicao */  
- string  varInt  ;  
- 
- int  a  ;  
- 
- a = 2  *  4  ;  
- 
- funcao  ( a ,  v  )  ;  
- 
- int a  =  2  ;  
- 
- def  int  myTeste  (  int par2  )  {  
- 
-     string  funcV2  =  "texto"  ;  
- 
-     devolve  funcV2  ;  
- 
- }  
- 
- int  tetris  =  2  *  2  ;  
- 
- int  b  ;  
- 
- myTeste  ( b  )  ;
+/* variavel sem utilizacao */  
+string  varInt  ;  
+
+/* variavel sem atribuicao */
+bool funcV2;
+
+tuplo  a  ;  
+
+/* variavel já declarada */
+int a = 2  *  4  ;  
+
+/* variavel 'v' nao declarada */
+myTeste2  ( a ,  v  , funcV2)  ; 
+
+def  int  myTeste  (  int par2  )  {  
+    string  funcV2  =  "texto"  ;  
+    array teste = [];
+    devolve  funcV2  ;  
+}  
+int  tetris  =  2  *  2  ;  
+int  b  ;  
+
+def array myTeste2  (  int par  )  {  
+    /* variavel 'teste' declarada na funcao myTeste */
+    array teste2 = [];
+    devolve  teste  ;
+}
+
+myTeste  ( b  )  ;
+
+
+se b > 1 {
+    string k;
+}senao{
+    int sEnao;
+}
+
+
+se c < 3 {
+    int sE;
+}

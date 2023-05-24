@@ -3,6 +3,8 @@ int varInt;
 
 int a;
 
+int camelo;
+
 funcao(a, v);
 
 int tetris = nabica;

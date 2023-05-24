@@ -1,0 +1,33 @@
+
+string varInt; 
+
+bool funcV2; 
+
+tuplo a; 
+
+int a  =  2 * 4  ; 
+
+funcao( a,  v,  funcV2); 
+
+def int myTeste( int par2){
+    string funcV2  =  "texto"  ; 
+    array teste  =  [ ]  ; 
+    devolve funcV2  ;  
+}
+
+def array myTeste2( int par){
+    array teste  =  [ ]  ; 
+    devolve teste  ;
+}
+
+int tetris  =  2 * 2  ; 
+
+int b; 
+
+myTeste( b); 
+
+se b  > 1 {
+    se c  < 3 {
+        int sE; 
+    }
+}

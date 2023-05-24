@@ -1,18 +1,18 @@
-
 r'''
 //Regras Sintaticas
 start: componentes
 componentes: (componente|deffuncao)*
-componente: declaracao | COMENTARIO | instrucao 
-declaracao: tipo ID ( "=" ecomp )? PVIR    
+componente: COMENTARIO | instrucao   
 deffuncao: DEF tipo ID "(" params? ")" corpofunc
 funcao: ID "(" (ecomp("," ecomp)*)? ")"
 instrucao : atribuicao PVIR
         | leitura PVIR
         | escrita PVIR
+        | declaracao PVIR
         | selecao
         | repeticao
         | funcao PVIR
+declaracao: tipo ID ( "=" ecomp )? 
 tipo : INT
     | BOOLEAN
     | STRING
@@ -22,8 +22,8 @@ tipo : INT
 ecomp: exp|elemcomp
 exp: NUM op NUM
     | ID "[" NUM "]"
-    | ID "." oplist
-    | ID "." ID
+    | ID DOT oplist
+    | ID DOT ID
 op :  ADD
     | SUB
     | DIV
@@ -38,12 +38,13 @@ oplist : CONS
 params: param (VIR param)*
 param: tipo ID
 corpofunc: "{" (componente|deffuncao|retorno)* "}"
-atribuicao: ID "=" (ecomp)
+atribuicao: ID "=" ecomp
 leitura: LER "(" ficheiro "," ID ")"
 escrita: ESCREVER "(" ficheiro "," ID ")"
-ficheiro: ID ("." ID)?
-selecao: SE comp "{" (declaracao|COMENTARIO|instrucao)* "}"
+ficheiro: ID (DOT ID)?
+selecao: SE comp "{" (COMENTARIO|instrucao)* "}" senao?
         | CASO ID caso+ END
+senao: SENAO "{" (COMENTARIO|instrucao)* "}"
 repeticao: ENQ comp FAZER componente+ END
         | REPETIR componente+ ATE comp END
         | PARA interv FAZER componente+ END
@@ -70,7 +71,6 @@ array : "[" (elemcomp (VIR elemcomp)*)? "]"
 tuplo : "(" elemcomp (VIR elemcomp)+ ")"
 lista : elemcomp "->" elemcomp
 bool : TRUE | FALSE
-//
 //
 //Regras Lexicográficas
 //
@@ -102,6 +102,7 @@ VIR: ","
 LER: "ler"
 ESCREVER: "escrever"
 SE: "se"
+SENAO: "senao"
 CASO: "caso"
 ENQ: "enquanto"
 FAZER: "fazer"
@@ -117,6 +118,7 @@ DIF : "!="
 LESS : "<"
 G : ">"
 STR: /"(\\\"|[^"])*"/
+DOT: "."
 //Tratamento dos espaços em branco
 %import common.WS
 %ignore WS
