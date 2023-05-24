@@ -39,3 +39,16 @@ se b > 1 {
 se c < 3 {
     int sE;
 }
+
+/* repeticao enq */
+enquanto 1 >= 1 
+fazer 
+    int e = 1 -17;
+    tuplo eg = (e,g); 
+end
+
+int besta = 3;
+
+se c < 3 {
+    int sE;
+}
