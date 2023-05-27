@@ -1,3 +1,0 @@
->adicionar SENAO ao SE 
-> cada funcao retorna o valor em html do codigo que deu match. Os terminais retornam <p id="tipo_id">valor</p>, os nao terminais retornam <div id="tipo_id"> valor </div>
-> remover os literais e colocar como terminais

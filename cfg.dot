@@ -1,4 +1,4 @@
-digraph G {
+digraph CFG{
 "0:  string varInt  ;  " -> "1:  bool funcV2  ;  "
 "1:  bool funcV2  ;  " -> "2:  tuplo a  ;  "
 "2:  tuplo a  ;  " -> "3:  int a = 2 * 4    ;  "
@@ -14,15 +14,17 @@ digraph G {
 "11: devolve teste  ; " -> "Exit_myTeste2"
 "9:  int b  ;  " -> "12: myTeste( b   )   ;  "
 "12: myTeste( b   )   ;  " -> "13: se b  > 1   "
+"13: se b  > 1   " [shape=diamond]
 "13: se b  > 1   " -> "14: ENTAO"
 "14: ENTAO" -> "15:  string k  ;  "
-"13: se b  > 1   " -> "16: SENAO "
-"16: SENAO " -> "17:  int sEnao  ;  "
-"17:  int sEnao  ;  " -> "18: SAIR_SE"
-"15:  string k  ;  " -> "18: SAIR_SE"
-"18: SAIR_SE" -> "20: se c  < 3   "
-"20: se c  < 3   " -> "21: ENTAO"
-"21: ENTAO" -> "22:  int sE  ;  "
-"22:  int sE  ;  " -> "23: SAIR_SE"
-"20: se c  < 3   " -> "23: SAIR_SE"
+"15:  string k  ;  " -> "16: se c  < 3   "
+"16: se c  < 3   " [shape=diamond]
+"16: se c  < 3   " -> "17: ENTAO"
+"17: ENTAO" -> "18:  int sE  ;  "
+"18:  int sE  ;  " -> "19: SAIR_SE"
+"16: se c  < 3   " -> "19: SAIR_SE"
+"13: se b  > 1   " -> "21: SENAO "
+"21: SENAO " -> "22:  int sEnao  ;  "
+"22:  int sEnao  ;  " -> "23: SAIR_SE"
+"19: SAIR_SE" -> "23: SAIR_SE"
 }

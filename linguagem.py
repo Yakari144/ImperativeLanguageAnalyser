@@ -470,7 +470,8 @@ class MyInterpreter(Interpreter):
         self.HTML = ""
         self.eC = {}
         self.ecStack = []
-        self.cfg = "digraph G {\n"
+        self.cfg = "digraph CFG{\n"
+        self.sdg = "digraph SDG{\n"
         self.cfgAnt = ""
         self.instC = 0
 
@@ -481,8 +482,12 @@ class MyInterpreter(Interpreter):
         self.HTML += "<br>"
         self.visit_children(tree)
         self.cfg+="}\n"
+        self.sdg+="}\n"
         with open("cfg.dot", "w") as f:
             f.write(self.cfg)
+            f.close()
+        with open("sdg.dot", "w") as f:
+            f.write(self.sdg)
             f.close()
         self.HTML +=f"""
             </code></pre>
@@ -669,6 +674,8 @@ class MyInterpreter(Interpreter):
         if self.cfgAnt != "":
             self.cfg+= '"'+self.cfgAnt + '" -> "' + retorno + '"\n'
         self.cfgAnt = retorno
+        f = self.funcAct() if self.funcAct() != None else "GLOBAL"
+        self.sdg+='Entry_'+f+' -> "'+retorno+'"\n'
         retorno+="\n"
         self.instC += 1
         return retorno
@@ -913,6 +920,7 @@ class MyInterpreter(Interpreter):
                     retorno += self.visit(elemento) + " "
                     self.cfg+= '"'+self.cfgAnt + '" -> "' + retorno + '"\n'
                     inicioIF = retorno
+                    self.cfg+= '"'+inicioIF+'" [shape=diamond]\n'
                     entao = str(self.instC)+": ENTAO"
                     self.instC += 1
                     self.cfg+= '"'+retorno + '" -> "'+entao +'"\n'
@@ -1003,9 +1011,9 @@ class MyInterpreter(Interpreter):
                 retorno += id + " "
                 self.HTML += "<span class='ciclo'> "+id+" </span>"
                 if (elemento.type=='ENQ'):
-                    self.pushEc("do")
-                elif (elemento.type == 'REPETIR'):
                     self.pushEc("while")
+                elif (elemento.type == 'REPETIR'):
+                    self.pushEc("do")
                 elif (elemento.type == 'PARA'):
                     self.pushEc("for")
                 elif (elemento.type=='END'):
@@ -1028,7 +1036,9 @@ class MyInterpreter(Interpreter):
                 elif (elemento.type =='PVIR'):
                     self.HTML += "<span class='code'> "+id+" </span> <br> <br>"
         self.cfg += "\""+ self.cfgAnt + "\" -> \"" + retorno + "\"\n"
-        self.cfg += "\""+ retorno + "\" -> \"" + "Exit_"+self.funcAct() + "\"\n"
+        f = self.funcAct() if self.funcAct() != None else "GLOBAL"
+        self.cfg += "\""+ retorno + "\" -> \"" + "Exit_"+f + "\"\n"
+        self.sdg+='Entry_'+f+' -> "'+retorno+'"\n'
         self.cfgAnt = ''
         return retorno+"\n"
                 

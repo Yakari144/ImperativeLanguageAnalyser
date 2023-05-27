@@ -31,11 +31,10 @@ myTeste  ( b  )  ;
 
 se b > 1 {
     string k;
+    se c < 3 {
+        int sE;
+    }
 }senao{
     int sEnao;
 }
 
-
-se c < 3 {
-    int sE;
-}
