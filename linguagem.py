@@ -661,7 +661,7 @@ class MyInterpreter(Interpreter):
                     self.instructions[elemento.data] = 1
                 else :
                     self.instructions[elemento.data] += 1
-                if elemento.data=='selecao':
+                if elemento.data=='selecao' or elemento.data=='repeticao':
                     self.visit(elemento)
                     retorno = self.cfgAnt
                     self.cfgAnt = ""
@@ -1002,21 +1002,41 @@ class MyInterpreter(Interpreter):
                     self.HTML += self.getTab() +"<span class='code'> "+comentario+" </span> <br>"
         
     def repeticao(self, tree):
-        retorno = "" 
+        retorno = ""
+        inicioCiclo = ""
+        enquanto = False
+        fazer = False
         for elemento in tree.children:
             if (type(elemento) == Tree):
-                retorno += self.visit(elemento) + " "
+                if (elemento.data == 'comp'):
+                    if(enquanto):
+                        retorno += self.visit(elemento) + " "
+                        self.cfg += '"'+self.cfgAnt + '" -> "' + str(self.instC) + ': ' + retorno + '"\n'
+                        self.cfgAnt = str(self.instC) + ": " + retorno
+                        inicioCiclo = self.cfgAnt
+                        self.instC += 1
+                elif (elemento.data == 'componente'):
+                    if(fazer):
+                        self.visit(elemento)
             else:
                 id = elemento.value
                 retorno += id + " "
                 self.HTML += "<span class='ciclo'> "+id+" </span>"
                 if (elemento.type=='ENQ'):
+                    enquanto = True
+                    self.pushEc("do")
+                elif (elemento.type == 'REPETIR'):
                     self.pushEc("while")
                 elif (elemento.type == 'REPETIR'):
                     self.pushEc("do")
                 elif (elemento.type == 'PARA'):
                     self.pushEc("for")
+                elif (elemento.type == 'FAZER'):
+                    fazer = True
+                    self.pushEc("while")
                 elif (elemento.type=='END'):
+                    self.cfg += '"'+self.cfgAnt + '" -> "' + inicioCiclo + '"\n'
+                    self.cfgAnt = inicioCiclo
                     self.HTML += " <br> <br>"
         self.popEc()
         return retorno
@@ -1159,7 +1179,7 @@ class MyInterpreter(Interpreter):
         self.HTML += "<span class='code'> ( </span>"
         for elemento in tree.children:
             if (type(elemento)==Tree):
-                self.visit(elemento)
+                retorno += self.visit(elemento)
             else :
                 if (elemento.type=='VIR'):
                     retorno += ", " + " "

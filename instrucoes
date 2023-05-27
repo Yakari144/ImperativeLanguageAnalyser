@@ -16,3 +16,7 @@
 }
  12: myTeste( b   )   ;  
 23: SAIR_SE
+28: SAIR_SE
+30: enquanto 1  >= 1   
+34:  int besta = 3    ;  
+38: SAIR_SE
