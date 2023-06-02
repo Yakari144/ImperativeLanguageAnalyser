@@ -1,15 +1,16 @@
-0:  string varInt  ;  
-1:  bool funcV2  ;  
- def  int  myTeste(  int par2   ) {
-2:  string funcV2 = \"texto\"    ;  
-3:  array teste = [ ]    ;  
-4: devolve funcV2  ; 
+0:  int final2 = 3    ;  
+ def  int  maior(  int num1  ,  int num2   ) {
+1:  int maior  ;  
+8: SAIR_SE
+10: devolve maior  ; 
 }
- 5: a =  myTeste( 1   )      ;  
- def  array  myTeste2(  int par   ) {
-6:  array teste2 = [ ]    ;  
-10: SAIR_SE
-12: devolve teste  ; 
+  def  bool  divisivel(  int a   ) {
+11: enquanto 1  >= 1   
+13: devolve e  ; 
 }
- 13: myTeste2( 1   )   ;  
-25: SAIR_SE
+ 14:  int valor = 4    ;  
+ def  int  main(  int a  ,  int b   ) {
+15:  bool teste = divisivel( a   )     ;  
+16:  bool teste2 = maior( b   ,  a   )     ;  
+}
+ 17:  int final = 10    ;  
