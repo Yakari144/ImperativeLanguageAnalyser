@@ -1,3 +1,4 @@
+import re
 from lark import Lark, Token, Tree
 from lark.visitors import Interpreter
 from lark import Discard
@@ -470,8 +471,7 @@ class MyInterpreter(Interpreter):
         self.HTML = ""
         self.eC = {}
         self.ecStack = []
-        self.cfg = "digraph CFG{\n"
-        self.sdg = "digraph SDG{\n"
+        self.cfg = "digraph G {\n"
         self.cfgAnt = ""
         self.instC = 0
 
@@ -482,12 +482,8 @@ class MyInterpreter(Interpreter):
         self.HTML += "<br>"
         self.visit_children(tree)
         self.cfg+="}\n"
-        self.sdg+="}\n"
         with open("cfg.dot", "w") as f:
             f.write(self.cfg)
-            f.close()
-        with open("sdg.dot", "w") as f:
-            f.write(self.sdg)
             f.close()
         self.HTML +=f"""
             </code></pre>
@@ -674,8 +670,6 @@ class MyInterpreter(Interpreter):
         if self.cfgAnt != "":
             self.cfg+= '"'+self.cfgAnt + '" -> "' + retorno + '"\n'
         self.cfgAnt = retorno
-        f = self.funcAct() if self.funcAct() != None else "GLOBAL"
-        self.sdg+='Entry_'+f+' -> "'+retorno+'"\n'
         retorno+="\n"
         self.instC += 1
         return retorno
@@ -920,7 +914,6 @@ class MyInterpreter(Interpreter):
                     retorno += self.visit(elemento) + " "
                     self.cfg+= '"'+self.cfgAnt + '" -> "' + retorno + '"\n'
                     inicioIF = retorno
-                    self.cfg+= '"'+inicioIF+'" [shape=diamond]\n'
                     entao = str(self.instC)+": ENTAO"
                     self.instC += 1
                     self.cfg+= '"'+retorno + '" -> "'+entao +'"\n'
@@ -1004,20 +997,56 @@ class MyInterpreter(Interpreter):
     def repeticao(self, tree):
         retorno = ""
         inicioCiclo = ""
+        inicioDoWhile=""
         enquanto = False
         fazer = False
+        repetir = False
+        ate = False
+        endAte = False
+        para = False
         for elemento in tree.children:
             if (type(elemento) == Tree):
                 if (elemento.data == 'comp'):
                     if(enquanto):
                         retorno += self.visit(elemento) + " "
-                        self.cfg += '"'+self.cfgAnt + '" -> "' + str(self.instC) + ': ' + retorno + '"\n'
+                        self.cfg += '"'+ self.cfgAnt + '" -> "' + str(self.instC) + ': ' + retorno + '"\n'
+                        self.cfg += '"'+ str(self.instC) + ": " + re.sub("\n", "", retorno) + '" [shape=diamond]\n'
                         self.cfgAnt = str(self.instC) + ": " + retorno
                         inicioCiclo = self.cfgAnt
-                        self.instC += 1
-                elif (elemento.data == 'componente'):
+                        #self.instC += 1
+                        enquanto = False
+                    if(ate):
+                        print(inicioDoWhile)
+                        retorno = self.visit(elemento)
+                        print(retorno)
+                        self.cfg += '"'+ re.sub("\n", "", inicioDoWhile) + '" -> "' + str(self.instC) + ': ATE ' + retorno + '"\n'
+                        self.cfg += '"'+ str(self.instC) + ": ATE " + re.sub("\n", "", retorno) + '" -> "' + re.sub("\n", "", inicioDoWhile) + '"\n'
+                        self.cfg += '"'+ str(self.instC) + ": ATE " + re.sub("\n", "", retorno) + '" [shape=diamond]\n'
+                        self.cfgAnt = str(self.instC) + ": ATE "  + retorno
+                        #self.instC += 1
+                        ate = False
+                        endAte = True
+                elif(elemento.data == 'componente'):
                     if(fazer):
                         self.visit(elemento)
+                        fazer = False
+                    if(repetir):
+                        anterior = self.cfgAnt
+                        retorno  = self.visit(elemento)
+                        #self.cfg += '"'+ anterior + '" -> "' + re.sub("\n", "", retorno) + '"\n' # esta linha está a escrever em dplicado em algum sitio
+                        inicioDoWhile = retorno
+                        self.cfgAnt = retorno
+                        #self.instC += 1
+                        repetir = False
+                elif (elemento.data == 'interv'):
+                    if(para):
+                        retorno += self.visit(elemento) + " "
+                        self.cfg += '"'+ self.cfgAnt + '" -> "' + str(self.instC) + ': ' + retorno + '"\n'
+                        self.cfg += '"'+ str(self.instC) + ": " + retorno + '" [shape=diamond]\n'
+                        self.cfgAnt = str(self.instC) + ": " + retorno
+                        inicioCiclo = self.cfgAnt
+                        #self.instC += 1
+                        para = False
             else:
                 id = elemento.value
                 retorno += id + " "
@@ -1026,18 +1055,24 @@ class MyInterpreter(Interpreter):
                     enquanto = True
                     self.pushEc("do")
                 elif (elemento.type == 'REPETIR'):
+                    repetir = True
                     self.pushEc("while")
-                elif (elemento.type == 'REPETIR'):
-                    self.pushEc("do")
                 elif (elemento.type == 'PARA'):
+                    para = True
                     self.pushEc("for")
                 elif (elemento.type == 'FAZER'):
                     fazer = True
+                    self.pushEc("do")
+                elif (elemento.type == 'ATE'):
+                    ate = True
                     self.pushEc("while")
                 elif (elemento.type=='END'):
-                    self.cfg += '"'+self.cfgAnt + '" -> "' + inicioCiclo + '"\n'
-                    self.cfgAnt = inicioCiclo
-                    self.HTML += " <br> <br>"
+                    if(endAte):
+                        endAte = False
+                    else:
+                        self.cfg += '"'+self.cfgAnt + '" -> "' + inicioCiclo + '"\n'
+                        self.cfgAnt = inicioCiclo
+                        self.HTML += " <br> <br>"
         self.popEc()
         return retorno
                 
@@ -1056,9 +1091,7 @@ class MyInterpreter(Interpreter):
                 elif (elemento.type =='PVIR'):
                     self.HTML += "<span class='code'> "+id+" </span> <br> <br>"
         self.cfg += "\""+ self.cfgAnt + "\" -> \"" + retorno + "\"\n"
-        f = self.funcAct() if self.funcAct() != None else "GLOBAL"
-        self.cfg += "\""+ retorno + "\" -> \"" + "Exit_"+f + "\"\n"
-        self.sdg+='Entry_'+f+' -> "'+retorno+'"\n'
+        self.cfg += "\""+ retorno + "\" -> \"" + "Exit_"+self.funcAct() + "\"\n"
         self.cfgAnt = ''
         return retorno+"\n"
                 
@@ -1223,7 +1256,3 @@ p = Lark(grammar)
 p = Lark(grammar)
 tree = p.parse(frase)
 data = MyInterpreter().visit(tree)
-
-
-
-
