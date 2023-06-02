@@ -1,22 +1,15 @@
 0:  string varInt  ;  
 1:  bool funcV2  ;  
-2:  tuplo a  ;  
-3:  int a = 2 * 4    ;  
-4: myTeste2( a   ,  v   ,  funcV2   )   ;  
  def  int  myTeste(  int par2   ) {
-5:  string funcV2 = \"texto\"    ;  
-6:  array teste = [ ]    ;  
-7: devolve funcV2  ; 
+2:  string funcV2 = \"texto\"    ;  
+3:  array teste = [ ]    ;  
+4: devolve funcV2  ; 
 }
- 8:  int tetris = 2 * 2    ;  
-9:  int b  ;  
+ 5: a =  myTeste( 1   )      ;  
  def  array  myTeste2(  int par   ) {
-10:  array teste2 = [ ]    ;  
-11: devolve teste  ; 
+6:  array teste2 = [ ]    ;  
+10: SAIR_SE
+12: devolve teste  ; 
 }
- 12: myTeste( b   )   ;  
-23: SAIR_SE
-28: SAIR_SE
-30: enquanto 1  >= 1   
-34:  int besta = 3    ;  
-38: SAIR_SE
+ 13: myTeste2( 1   )   ;  
+25: SAIR_SE

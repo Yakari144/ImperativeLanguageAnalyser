@@ -1,0 +1,34 @@
+/* variavel sem utilizacao */  
+string  varInt  ;  
+
+/* variavel sem atribuicao */
+bool funcV2;
+
+def  int  myTeste  (  int par2  )  {  
+    string  funcV2  =  "texto"  ;  
+    array teste = [];
+    devolve  funcV2  ;  
+}  
+
+a = myTeste(1);
+
+def array myTeste2  (  int par  )  {  
+    /* variavel 'teste' declarada na funcao myTeste */
+    array teste2 = [];
+    se c < 3 {
+        int sE;
+    }
+    devolve  teste  ;
+}
+
+myTeste2(1);
+
+se b > 1 {
+    string k;
+    se c < 3 {
+        int sE;
+    }
+}senao{
+    int sEnao;
+}
+

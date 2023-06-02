@@ -449,6 +449,11 @@ class MyInterpreter(Interpreter):
                 x['class'] = 'naoUsada'
             self.HTML = str(soup)
            
+    def getSDGFunc(self):
+        if len(self.sdgFunc) > 0:
+            return '"'+self.sdgFunc[-1]+'"'
+        else:
+            return 'Entry_GLOBAL'
 #####################################################
 ################ Interpreter methods ################
 #####################################################
@@ -465,6 +470,7 @@ class MyInterpreter(Interpreter):
                     variaveis   : array  : False : True :
         '''
         # create a stack to store the current function
+        self.sdgFunc = []
         self.funcStack = []
         self.instructions = {}
         self.HTML = ""
@@ -616,6 +622,7 @@ class MyInterpreter(Interpreter):
                 t = elemento.value
                 if (elemento.type == 'ID'):
                     self.pushFunc(t)
+                    self.sdgFunc.append("Entry_"+t)
                     self.HTML += "<span class='funcName'> " + t + "</span> <span class='code'> ( </span>"
                     retorno += " "+ t + "(" + " "
                     self.cfgAnt = "Entry_"+t
@@ -631,6 +638,7 @@ class MyInterpreter(Interpreter):
             self.cfg += '"'+ self.cfgAnt + "\" -> " + "Exit_"+self.funcAct() + "\n"
         self.cfgAnt = ant
         self.popFunc()
+        self.sdgFunc.pop()
         return retorno
  
     def funcao(self,tree):
@@ -649,12 +657,14 @@ class MyInterpreter(Interpreter):
                     id = elemento.value     
                     retorno += id +"(" + " "
                     self.HTML += "<span class='funcName' id ='"+ str(self.funcAct()) + "-" + id +"'> " + id + " </span> <span class='code'>(</span>"
+                    self.sdg += self.getSDGFunc()+' -> "Entry_'+id+'"\n'
         self.HTML += "<span class='code'> ) </span>" 
         retorno += ")" + " "
         return retorno
         
     def instrucao(self, tree):
         retorno = str(self.instC) +": " 
+        isF = ""
         for elemento in tree.children:
             if (type(elemento)==Tree):
                 if elemento.data not in self.instructions.keys():
@@ -666,16 +676,19 @@ class MyInterpreter(Interpreter):
                     retorno = self.cfgAnt
                     self.cfgAnt = ""
                 else:
-                    retorno += self.visit(elemento) + " "
+                    t = self.visit(elemento)
+                    retorno += t + " "
+                    if (elemento.data == 'funcao'):    
+                        isF = t
             else:
                 if (elemento.type == 'PVIR'):
                     self.HTML += "<span class='code'> ; </span> <br> <br>"
                     retorno += " ; " + " "
         if self.cfgAnt != "":
             self.cfg+= '"'+self.cfgAnt + '" -> "' + retorno + '"\n'
+            f = self.getSDGFunc()
+            self.sdg+=f+' -> "'+retorno+'"\n'
         self.cfgAnt = retorno
-        f = self.funcAct() if self.funcAct() != None else "GLOBAL"
-        self.sdg+='Entry_'+f+' -> "'+retorno+'"\n'
         retorno+="\n"
         self.instC += 1
         return retorno
@@ -917,19 +930,44 @@ class MyInterpreter(Interpreter):
             t = ""
             if (type(elemento)==Tree):
                 if (elemento.data == 'comp') and se:
+                    # instrucao do if
                     retorno += self.visit(elemento) + " "
+                    # grafo CFG ant->if
                     self.cfg+= '"'+self.cfgAnt + '" -> "' + retorno + '"\n'
+                    # grafo SDG func->if
+                    self.sdg+= self.getSDGFunc()+' -> "' + retorno + '"\n'
+                    # update func para if
+                    self.sdgFunc.append(retorno)
+                    # guarda inicio do if
                     inicioIF = retorno
-                    self.cfg+= '"'+inicioIF+'" [shape=diamond]\n'
+                    # instrucao then
                     entao = str(self.instC)+": ENTAO"
+                    self.sdgFunc.append(entao)
                     self.instC += 1
-                    self.cfg+= '"'+retorno + '" -> "'+entao +'"\n'
-                    self.cfgAnt = entao
+                    # instrucao else no CFG
+                    self.cfg+= '"'+inicioIF + '" -> "'+entao +'"\n'
+                    # instrucao else no SDG
+                    self.sdg+= '"'+inicioIF+'" -> "'+entao+'"\n'
+                    # colocar o if em diamante
+                    self.cfg+= '"'+inicioIF+'" [shape=diamond]\n'
                     retorno += " {\n"
                     self.HTML += "<span class='code'> { </span> <br> <br>"
                 elif (elemento.data == 'senao'):
-                    ant = self.cfgAnt
+                    # instrucao else
+                    senao = str(self.instC)+": SENAO"
+                    self.instC += 1
+                    # instrucao else no CFG
+                    self.cfg+= '"'+inicioIF + '" -> "'+senao +'"\n'
+                    # instrucao else no SDG
+                    self.sdg+= '"'+inicioIF+'" -> "'+senao+'"\n'
+                    # pop do then no SDG
+                    self.sdgFunc.pop()
+                    # update func para else
+                    self.sdgFunc.append(senao)
+                    # guarda inicio do else no CFG
+                    ant = senao
                     self.cfgAnt = inicioIF
+                    # trata do corpo do else
                     self.visit(elemento)
                     senao = True
                 elif (elemento.data == 'caso'):
@@ -964,6 +1002,11 @@ class MyInterpreter(Interpreter):
                     comentario = elemento.value
                     self.HTML += self.getTab() +"<span class='code'> "+comentario+" </span> <br>"
         if se: 
+            # pop do then ou do else no SDG
+            self.sdgFunc.pop()
+            # pop do if no SDG
+            self.sdgFunc.pop()
+
             ex = str(self.instC)+": SAIR_SE"
             self.instC += 1
             self.cfg+= '"'+self.cfgAnt + '" -> "' + ex + '"\n'
@@ -1058,7 +1101,9 @@ class MyInterpreter(Interpreter):
         self.cfg += "\""+ self.cfgAnt + "\" -> \"" + retorno + "\"\n"
         f = self.funcAct() if self.funcAct() != None else "GLOBAL"
         self.cfg += "\""+ retorno + "\" -> \"" + "Exit_"+f + "\"\n"
-        self.sdg+='Entry_'+f+' -> "'+retorno+'"\n'
+        
+        
+        self.sdg+= self.getSDGFunc()+' -> "'+retorno+'"\n'
         self.cfgAnt = ''
         return retorno+"\n"
                 
@@ -1213,8 +1258,8 @@ class MyInterpreter(Interpreter):
                     self.HTML += "<span class='code'> false </span>"
         return retorno
         
-
-f = open('linguagem2.txt', 'r')
+f = open('testeSDG.txt', 'r')
+#f = open('linguagem2.txt', 'r')
 frase = f.read()
 f.close()
 
