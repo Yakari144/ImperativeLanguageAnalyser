@@ -1,4 +1,4 @@
-digraph CFG{
+digraph G {
 "0:  string varInt  ;  " -> "1:  bool funcV2  ;  "
 "Entry_myTeste" -> "2:  string funcV2 = \"texto\"    ;  "
 "2:  string funcV2 = \"texto\"    ;  " -> "3:  array teste = [ ]    ;  "

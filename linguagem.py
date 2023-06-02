@@ -1,3 +1,4 @@
+import re
 from lark import Lark, Token, Tree
 from lark.visitors import Interpreter
 from lark import Discard
@@ -450,10 +451,11 @@ class MyInterpreter(Interpreter):
             self.HTML = str(soup)
            
     def getSDGFunc(self):
+        r = 'Entry_GLOBAL'
         if len(self.sdgFunc) > 0:
-            return '"'+self.sdgFunc[-1]+'"'
-        else:
-            return 'Entry_GLOBAL'
+            r = "\""+self.sdgFunc[-1]+"\""
+        return r
+    
 #####################################################
 ################ Interpreter methods ################
 #####################################################
@@ -476,8 +478,8 @@ class MyInterpreter(Interpreter):
         self.HTML = ""
         self.eC = {}
         self.ecStack = []
-        self.cfg = "digraph CFG{\n"
-        self.sdg = "digraph SDG{\n"
+        self.cfg = "digraph G {\n"
+        self.sdg = "digraph G {\n"
         self.cfgAnt = ""
         self.instC = 0
 
@@ -488,12 +490,8 @@ class MyInterpreter(Interpreter):
         self.HTML += "<br>"
         self.visit_children(tree)
         self.cfg+="}\n"
-        self.sdg+="}\n"
         with open("cfg.dot", "w") as f:
             f.write(self.cfg)
-            f.close()
-        with open("sdg.dot", "w") as f:
-            f.write(self.sdg)
             f.close()
         self.HTML +=f"""
             </code></pre>
@@ -1047,20 +1045,56 @@ class MyInterpreter(Interpreter):
     def repeticao(self, tree):
         retorno = ""
         inicioCiclo = ""
+        inicioDoWhile=""
         enquanto = False
         fazer = False
+        repetir = False
+        ate = False
+        endAte = False
+        para = False
         for elemento in tree.children:
             if (type(elemento) == Tree):
                 if (elemento.data == 'comp'):
                     if(enquanto):
                         retorno += self.visit(elemento) + " "
-                        self.cfg += '"'+self.cfgAnt + '" -> "' + str(self.instC) + ': ' + retorno + '"\n'
+                        self.cfg += '"'+ self.cfgAnt + '" -> "' + str(self.instC) + ': ' + retorno + '"\n'
+                        self.cfg += '"'+ str(self.instC) + ": " + re.sub("\n", "", retorno) + '" [shape=diamond]\n'
                         self.cfgAnt = str(self.instC) + ": " + retorno
                         inicioCiclo = self.cfgAnt
-                        self.instC += 1
-                elif (elemento.data == 'componente'):
+                        #self.instC += 1
+                        enquanto = False
+                    if(ate):
+                        print(inicioDoWhile)
+                        retorno = self.visit(elemento)
+                        print(retorno)
+                        self.cfg += '"'+ re.sub("\n", "", inicioDoWhile) + '" -> "' + str(self.instC) + ': ATE ' + retorno + '"\n'
+                        self.cfg += '"'+ str(self.instC) + ": ATE " + re.sub("\n", "", retorno) + '" -> "' + re.sub("\n", "", inicioDoWhile) + '"\n'
+                        self.cfg += '"'+ str(self.instC) + ": ATE " + re.sub("\n", "", retorno) + '" [shape=diamond]\n'
+                        self.cfgAnt = str(self.instC) + ": ATE "  + retorno
+                        #self.instC += 1
+                        ate = False
+                        endAte = True
+                elif(elemento.data == 'componente'):
                     if(fazer):
                         self.visit(elemento)
+                        fazer = False
+                    if(repetir):
+                        anterior = self.cfgAnt
+                        retorno  = self.visit(elemento)
+                        #self.cfg += '"'+ anterior + '" -> "' + re.sub("\n", "", retorno) + '"\n' # esta linha está a escrever em dplicado em algum sitio
+                        inicioDoWhile = retorno
+                        self.cfgAnt = retorno
+                        #self.instC += 1
+                        repetir = False
+                elif (elemento.data == 'interv'):
+                    if(para):
+                        retorno += self.visit(elemento) + " "
+                        self.cfg += '"'+ self.cfgAnt + '" -> "' + str(self.instC) + ': ' + retorno + '"\n'
+                        self.cfg += '"'+ str(self.instC) + ": " + retorno + '" [shape=diamond]\n'
+                        self.cfgAnt = str(self.instC) + ": " + retorno
+                        inicioCiclo = self.cfgAnt
+                        #self.instC += 1
+                        para = False
             else:
                 id = elemento.value
                 retorno += id + " "
@@ -1069,18 +1103,24 @@ class MyInterpreter(Interpreter):
                     enquanto = True
                     self.pushEc("do")
                 elif (elemento.type == 'REPETIR'):
+                    repetir = True
                     self.pushEc("while")
-                elif (elemento.type == 'REPETIR'):
-                    self.pushEc("do")
                 elif (elemento.type == 'PARA'):
+                    para = True
                     self.pushEc("for")
                 elif (elemento.type == 'FAZER'):
                     fazer = True
+                    self.pushEc("do")
+                elif (elemento.type == 'ATE'):
+                    ate = True
                     self.pushEc("while")
                 elif (elemento.type=='END'):
-                    self.cfg += '"'+self.cfgAnt + '" -> "' + inicioCiclo + '"\n'
-                    self.cfgAnt = inicioCiclo
-                    self.HTML += " <br> <br>"
+                    if(endAte):
+                        endAte = False
+                    else:
+                        self.cfg += '"'+self.cfgAnt + '" -> "' + inicioCiclo + '"\n'
+                        self.cfgAnt = inicioCiclo
+                        self.HTML += " <br> <br>"
         self.popEc()
         return retorno
                 
@@ -1101,8 +1141,6 @@ class MyInterpreter(Interpreter):
         self.cfg += "\""+ self.cfgAnt + "\" -> \"" + retorno + "\"\n"
         f = self.funcAct() if self.funcAct() != None else "GLOBAL"
         self.cfg += "\""+ retorno + "\" -> \"" + "Exit_"+f + "\"\n"
-        
-        
         self.sdg+= self.getSDGFunc()+' -> "'+retorno+'"\n'
         self.cfgAnt = ''
         return retorno+"\n"
@@ -1268,7 +1306,3 @@ p = Lark(grammar)
 p = Lark(grammar)
 tree = p.parse(frase)
 data = MyInterpreter().visit(tree)
-
-
-
-

@@ -55,3 +55,10 @@ int besta = 3;
 se c < 3 {
     int sE;
 }
+/* repeticao repetir */
+repetir a = a.snoc; ate !v end
+
+/* repeticao para */
+para [1,14] fazer a = palavra.id; end
+
+int aff = 3;
