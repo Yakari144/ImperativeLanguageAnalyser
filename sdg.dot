@@ -1,23 +1,26 @@
-digraph SDG{
-Entry_GLOBAL -> "1:  bool funcV2  ;  "
-"Entry_myTeste" -> "2:  string funcV2 = \"texto\"    ;  "
-"Entry_myTeste" -> "3:  array teste = [ ]    ;  "
-"Entry_myTeste" -> "4: devolve funcV2  ; "
-Entry_GLOBAL -> "Entry_myTeste"
-Entry_GLOBAL -> "5: a =  myTeste( 1   )      ;  "
-"Entry_myTeste2" -> "6:  array teste2 = [ ]    ;  "
-"Entry_myTeste2" -> "7: se c  < 3   "
-"7: se c  < 3   " -> "8: ENTAO"
-"8: ENTAO" -> "9:  int sE  ;  "
-"Entry_myTeste2" -> "12: devolve teste  ; "
-Entry_GLOBAL -> "Entry_myTeste2"
-Entry_GLOBAL -> "13: myTeste2( 1   )   ;  "
-Entry_GLOBAL -> "14: se b  > 1   "
-"14: se b  > 1   " -> "15: ENTAO"
-"15: ENTAO" -> "16:  string k  ;  "
-"15: ENTAO" -> "17: se c  < 3   "
-"17: se c  < 3   " -> "18: ENTAO"
-"18: ENTAO" -> "19:  int sE  ;  "
-"14: se b  > 1   " -> "22: SENAO"
-"22: SENAO" -> "24:  int sEnao  ;  "
+digraph G {
+"Entry_main" -> "1: enquanto i  < 10   "
+"1: enquanto i  < 10   " -> "2: i =  4 + 1     ;  "
+"1: enquanto i  < 10   " -> "3: k =  \"nao funfa\"     ;  "
+"Entry_main" -> "4: para [ 1 10 ] "
+"4: para [ 1 10 ] " -> "5: para =  14     ;  "
+"4: para [ 1 10 ] " -> "6: a =  14     ;  "
+"Entry_main" -> 7
+"7" -> "8: i =  3 - 1     ;  "
+"7" -> "9: k =  3 - 1     ;  "
+"7" [label="7: repetir ... ate i  > 0  "]
+"Entry_main" -> "10: se i  > 0   "
+"10: ENTAO" [label="ENTAO"]
+"10: se i  > 0   " -> "10: ENTAO"
+"10: ENTAO" -> "11: i =  3 - 1     ;  "
+"10: ENTAO" -> "12: n =  3 - 1     ;  "
+"Entry_main" -> "13: se i  > 0   "
+"13: ENTAO" [label="ENTAO"]
+"13: se i  > 0   " -> "13: ENTAO"
+"13: ENTAO" -> "14: i =  3 - 1     ;  "
+"13: ENTAO" -> "15: n =  3 - 1     ;  "
+"15: SENAO" [label="SENAO"]
+"13: se i  > 0   " -> "15: SENAO"
+"15: SENAO" -> "16: i =  3 - 1     ;  "
+"15: SENAO" -> "17: n =  3 - 1     ;  "
 }

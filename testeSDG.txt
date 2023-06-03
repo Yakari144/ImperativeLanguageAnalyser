@@ -1,34 +1,43 @@
-/* variavel sem utilizacao */  
-string  varInt  ;  
 
-/* variavel sem atribuicao */
-bool funcV2;
 
-def  int  myTeste  (  int par2  )  {  
-    string  funcV2  =  "texto"  ;  
-    array teste = [];
-    devolve  funcV2  ;  
-}  
+def int main ( ) {  
+    /* vai ter um ciclo while */
+    enquanto i < 10
+    fazer
+        i = 4 + 1;
+        k = "nao funfa";
+    end
 
-a = myTeste(1);
+    /* vai ter um ciclo for */
+    para [1 , 10]
+    fazer
+        para = 14;
+        a = 14;
+    end
 
-def array myTeste2  (  int par  )  {  
-    /* variavel 'teste' declarada na funcao myTeste */
-    array teste2 = [];
-    se c < 3 {
-        int sE;
+    /* vai ter um ciclo do while */
+    repetir
+        i = 3 - 1;
+        k = 3 - 1;
+    ate i > 0
+    end
+
+    /* vai ter um if */
+    se i > 0{
+        i = 3 - 1;
+        n = 3 - 1;
     }
-    devolve  teste  ;
-}
 
-myTeste2(1);
-
-se b > 1 {
-    string k;
-    se c < 3 {
-        int sE;
+    /* vai ter um if else */
+    se i > 0{
+        i = 3 - 1;
+        n = 3 - 1;
     }
-}senao{
-    int sEnao;
-}
+    senao{
+        i = 3 - 1;
+        n = 3 - 1;
+    }
 
+    /* vai ter um caso */
+
+}

@@ -1,15 +1,8 @@
-0:  string varInt  ;  
-1:  bool funcV2  ;  
- def  int  myTeste(  int par2   ) {
-2:  string funcV2 = \"texto\"    ;  
-3:  array teste = [ ]    ;  
-4: devolve funcV2  ; 
+ def  int  main( ) {
+1: enquanto i  < 10   
+4: para [ 1 10 ] 
+9: ATE i  > 0  
+12: SAIR_SE
+17: SAIR_SE
 }
- 5: a =  myTeste( 1   )      ;  
- def  array  myTeste2(  int par   ) {
-6:  array teste2 = [ ]    ;  
-10: SAIR_SE
-12: devolve teste  ; 
-}
- 13: myTeste2( 1   )   ;  
-25: SAIR_SE
+ 

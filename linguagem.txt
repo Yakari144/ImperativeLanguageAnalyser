@@ -1,93 +1,17 @@
-/* variavel sem atribuicao */
-int varInt;
-
-int a;
-
-int camelo;
-
-funcao(a, v);
-
-int tetris = nabica;
-
-int camelo = 2+2;
-
-int varInt;
-
-int x = [2,3,4];
-
-int cavalo = x.tail;
-
-int valorTe = tetris.value;
-
-
-/* variavel com atribuicao de inteiro */
-bool vAr2 = 10;
-
-/* variavel com atribuicao de bool */
-bool var = True;
-
-/* variavel com atribuicao de string */
-string v4r3 = "texto";
-
-int a=1;
-int b=2;
-
-/* variavel com atribuicao de array com [int, str, tuplo, lista, array, bool, bool] */
-array variav3 = [1,"texto",(a,b),a->b,[],True,False];
-
-/* variavel com atribuicao de tuplo com (int, str, tuplo, lista, array, bool, bool) */
-tuplo variave = (1,"texto",(a,b),a->b,[],True,False);
-
-/* variavel com atribuicao de lista com int -> str */
-lista variav2 = 1->"texto";
-
-/* funcao com retorno */
-def int funcao(string par1,tuplo par2){
-    int funcV = par1;
-    string funcV2 = "texto";
-    def string func4o2(int paulo){
-        /* funcao sem retorno */
-        paulo = 1;
+def int main(){
+    int i = 0;
+    /* vai ter um ciclo while */
+    enquanto i < 10{
+        i = i + 1;
     }
-    funcV = [];
-    devolve variavel;
-    devolve True;
+
+    /* vai ter um ciclo for */
+    para [1 , 10]{
+        int para = 14;
+    }
+
+    /* vai ter um ciclo do while */
+    repetir {
+        i = i - 1;
+    } ate i > 0;
 }
-
-/* atribuicao */
-palavra = ("tuplo",4);
-
-/* leitura */
-ler(ficheiro.txt,var);
-
-/* escrita */
-escrever(ficheiro,var);
-
-string teste;
-
-/* selecao if */
-se 1 == 1 {
-    f(queCenaMeu);
-}
-
-/* selecao caso */
-caso var "texto" : {
-    tuplo k = 14 % 2;
-    tuplo kaCena = 14 % 2;
-}
-1 : {
-    /* comentario */
-} end
-
-/* repeticao enq */
-enquanto 1 >= 1 
-fazer 
-    int e = 1 -17;
-    tuplo eg = (e,g); 
-end
-
-/* repeticao repetir */
-repetir a = a.snoc; ate !v end
-
-/* repeticao para */
-para [1,14] fazer a = palavra.id; end

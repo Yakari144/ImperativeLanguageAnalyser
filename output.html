@@ -1,8 +1,7 @@
-
-<!DOCTYPE html>
-
-<html>
-<style>
+ 
+        <!DOCTYPE html>
+        <html>
+        <style>
             .error {
                 position: relative;
                 display: inline-block;
@@ -106,31 +105,32 @@
             }
             
         </style>
-<body class="graficos">
-<h2 class="code">Análise de código</h2>
-<pre><code>
+        <body class="graficos">
+            <h2 class="code">Análise de código</h2>
+            <pre><code>
             <h3 class="code">Instruções de Análise - Variáveis</h3>
-            <span class="redeclaracao">Cor -</span> <span class="code"> Redeclaração </span> <br/> 
+            <span class="redeclaracao">Cor -</span> <span class="code"> Redeclaração </span> <br> 
 
-            <span class="naoDeclaracao">Cor -</span> <span class="code"> Não-Declaração </span> <br/> 
+            <span class="naoDeclaracao">Cor -</span> <span class="code"> Não-Declaração </span> <br> 
 
-            <span class="naoInicializada">Cor -</span> <span class="code"> Não-Inicializada </span> <br/> 
+            <span class="naoInicializada">Cor -</span> <span class="code"> Não-Inicializada </span> <br> 
 
-            <span class="naoUsada">Cor -</span> <span class="code"> Não-Utilizada </span> <br/> 
+            <span class="naoUsada">Cor -</span> <span class="code"> Não-Utilizada </span> <br> 
 
-        <br/><span class="code"> /* variavel sem utilizacao */ </span> <br/><span class="code"> string </span><span class="naoUsada" id="None-varInt"> varInt </span><span class="code"> ; </span> <br/> <br/><span class="code"> /* variavel sem atribuicao */ </span> <br/><span class="code"> bool </span><span class="naoUsada" id="None-funcV2"> funcV2 </span><span class="code"> ; </span> <br/> <br/><span class="def"> def </span><span class="code"> int </span><span class="funcName"> myTeste</span> <span class="code"> ( </span><span class="code"> int </span><span class="naoUsada" id="myTeste-par2">par2 </span><span class="code"> ) </span><span class="code"> { </span> <br/> <br/>	<span class="code"> string </span><span class="redeclaracao" id="myTeste-funcV2">funcV2 </span><span class="code"> = </span><span class="code"> \"texto\" </span><span class="code"> ; </span> <br/> <br/>	<span class="code"> array </span><span class="naoUsada" id="myTeste-teste"> teste </span><span class="code"> = </span><span class="code"> [ </span><span class="code"> ] </span><span class="code"> ; </span> <br/> <br/>	<span class="retornos"> devolve </span><span class="code"> ; </span> <br/> <br/>	<span class="code"> } </span> <br/> 
-<span class="code" id="None-a">a </span><span class="funcName" id="None-myTeste"> myTeste </span> <span class="code">(</span><span class="code"> 1 </span><span class="code"> ) </span><span class="code"> ; </span> <br/> <br/><span class="def"> def </span><span class="code"> array </span><span class="funcName"> myTeste2</span> <span class="code"> ( </span><span class="code"> int </span><span class="naoUsada" id="myTeste2-par">par </span><span class="code"> ) </span><span class="code"> { </span> <br/> <br/>	<span class="code"> /* variavel 'teste' declarada na funcao myTeste */ </span> <br/>	<span class="code"> array </span><span class="naoUsada" id="myTeste2-teste2"> teste2 </span><span class="code"> = </span><span class="code"> [ </span><span class="code"> ] </span><span class="code"> ; </span> <br/> <br/>	<span class="ciclo"> se </span><span class="naoDeclaracao"> c </span><span class="code"> &lt; </span><span class="code"> 3 </span><span class="code"> { </span> <br/> <br/>		<span class="code"> int </span><span class="naoUsada" id="myTeste2-sE"> sE </span><span class="code"> ; </span> <br/> <br/>	<span class="code"> } </span> <br/> <br/>	<span class="retornos"> devolve </span><span class="naoDeclaracao"> teste </span><span class="code"> ; </span> <br/> <br/>	<span class="code"> } </span> <br/> 
-<span class="funcName" id="None-myTeste2"> myTeste2 </span> <span class="code">(</span><span class="code"> 1 </span><span class="code"> ) </span><span class="code"> ; </span> <br/> <br/><span class="ciclo"> se </span><span class="naoDeclaracao"> b </span><span class="code"> &gt; </span><span class="code"> 1 </span><span class="code"> { </span> <br/> <br/>	<span class="code"> string </span><span class="naoUsada" id="None-k"> k </span><span class="code"> ; </span> <br/> <br/>	<span class="ciclo"> se </span><span class="naoDeclaracao"> c </span><span class="code"> &lt; </span><span class="code"> 3 </span><span class="code"> { </span> <br/> <br/>		<span class="code"> int </span><span class="naoUsada" id="None-sE"> sE </span><span class="code"> ; </span> <br/> <br/>	<span class="code"> } </span> <br/> <br/><span class="ciclo"> senao </span><span class="code"> int </span><span class="naoUsada" id="None-sEnao"> sEnao </span><span class="code"> ; </span> <br/> <br/><span class="code"> } </span> <br/> <br/>
+        <br><span class='def'> def </span><span class='code'> int </span><span class='funcName'> main</span> <span class='code'> ( </span><span class='code'> ) </span><span class='code'> { </span> <br> <br>	<span class='code'> /* vai ter um ciclo while */ </span> <br>	<span class='ciclo'> enquanto </span><span class='naoDeclaracao'> i </span><span class='code'> < </span><span class='code'> 10 </span><span class='ciclo'> fazer </span>			<span class='code' id ='main-i'>i </span><span class='code'> 4 </span><span class='code'> + </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br>			<span class='code' id ='main-k'>k </span><span class='code'> \"nao funfa\" </span><span class='code'> ; </span> <br> <br><span class='ciclo'> end </span> <br> <br>		<span class='code'> /* vai ter um ciclo for */ </span> <br>		<span class='ciclo'> para </span><span class='code'> [ </span><span class='code'> 1 </span><span class='code'>, </span><span class='code'> 10 </span><span class='code'> ] </span><span class='ciclo'> fazer </span>				<span class='code' id ='main-para'>para </span><span class='code'> 14 </span><span class='code'> ; </span> <br> <br>				<span class='code' id ='main-a'>a </span><span class='code'> 14 </span><span class='code'> ; </span> <br> <br><span class='ciclo'> end </span> <br> <br>			<span class='code'> /* vai ter um ciclo do while */ </span> <br>			<span class='ciclo'> repetir </span>				<span class='code' id ='main-i'>i </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br>				<span class='code' id ='main-k'>k </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br><span class='ciclo'> ate </span><span class='naoDeclaracao'> i </span><span class='code'> > </span><span class='code'> 0 </span><span class='ciclo'> end </span>				<span class='code'> /* vai ter um if */ </span> <br>				<span class='ciclo'> se </span><span class='naoDeclaracao'> i </span><span class='code'> > </span><span class='code'> 0 </span><span class='code'> { </span> <br> <br>					<span class='code' id ='main-i'>i </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br>					<span class='code' id ='main-n'>n </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br>				<span class='code'> } </span> <br> <br>				<span class='code'> /* vai ter um if else */ </span> <br>				<span class='ciclo'> se </span><span class='naoDeclaracao'> i </span><span class='code'> > </span><span class='code'> 0 </span><span class='code'> { </span> <br> <br>					<span class='code' id ='main-i'>i </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br>					<span class='code' id ='main-n'>n </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br><span class='ciclo'> senao </span><span class='code' id ='main-i'>i </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br><span class='code' id ='main-n'>n </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br>				<span class='code'> } </span> <br> <br>				<span class='code'> /* vai ter um caso */ </span> <br>				<span class='code'> } </span> <br> 
+
             </code></pre>
-<h3>Estatisticas</h3>
-<table>
-<tr>
-<th> </th><th> </th>
-</tr>
-<tr><td><span>Variáveis já declaradas:</span></td><td> 1</td></tr>
-<tr><td><span>Variáveis não declaradas:</span></td><td> 5</td></tr>
-<tr><td><span>Variáveis não utilizadas:</span></td><td> 5</td></tr>
-<tr><td><span>Variáveis não inicializadas:</span></td><td> 0</td></tr>
-<tr><td><span>Variáveis do tipo string:</span></td><td> 2</td></tr><tr><td><span>Variáveis do tipo bool:</span></td><td> 1</td></tr><tr><td><span>Variáveis do tipo int:</span></td><td> 5</td></tr><tr><td><span>Variáveis do tipo array:</span></td><td> 2</td></tr><tr><td><span>Total de variaveis:</span></td><td> 10</td></tr><tr><td><span>SE's dentro de SE's:</span></td><td>   1</td></tr><tr><td><span>SE's dentro de REP's:</span></td><td>  0</td></tr><tr><td><span>REP's dentro de SE's:</span></td><td>  0</td></tr><tr><td><span>REP's dentro de REP's:</span></td><td> 0</td></tr>
-</table></body>
-</html>
+            <h3>Estatisticas</h3>
+            <table>
+            <tr>
+                <th>  </th><th>  </th>
+                </tr>
+                <tr><td><span>Variáveis já declaradas:</td><td> 0</span></td></tr>
+                <tr><td><span>Variáveis não declaradas:</td><td> 16</span></td></tr>
+                <tr><td><span>Variáveis não utilizadas:</td><td> 0</span></td></tr>
+                <tr><td><span>Variáveis não inicializadas:</td><td> 0</span></td></tr>
+                
+        <tr><td><span>Total de variaveis:</td><td> 0</span></td></tr><tr><td><span>SE's dentro de SE's:</td><td>   0</span></td></tr><tr><td><span>SE's dentro de REP's:</td><td>  2</span></td></tr><tr><td><span>REP's dentro de SE's:</td><td>  0</span></td></tr><tr><td><span>REP's dentro de REP's:</td><td> 5</span></td></tr>
+        </body>
+        </html>
+        

@@ -147,6 +147,7 @@ class MyInterpreter(Interpreter):
 
     def pushFunc(self, func):
         self.funcStack.append(func)
+        self.variaveis[func] = []
 
     def getTabFunc(self):
         # get the number of functions in the stack
@@ -282,9 +283,14 @@ class MyInterpreter(Interpreter):
     def printVars(self):
         print("Variaveis:")
         # get the lenght of the longest variable name
-        maxnome = max([len(x['nome']) for x in self.variaveis['GLOBAL']])
-        # get the lenght of the longest variable name
-        maxtipo = max([len(x['tipo']) for x in self.variaveis['GLOBAL']])
+        vares = []
+        maxnome = 0
+        maxtipo = 0
+        for f in self.variaveis:
+            vares += self.variaveis[f]
+        if len(vares) > 0:
+            maxnome = max([len(x['nome']) for x in vares])
+            maxtipo = max([len(x['tipo']) for x in vares])
         for x in self.variaveis.keys():
             print("\t"+x)
             for y in self.variaveis[x]:
@@ -490,8 +496,12 @@ class MyInterpreter(Interpreter):
         self.HTML += "<br>"
         self.visit_children(tree)
         self.cfg+="}\n"
+        self.sdg+="}\n"
         with open("cfg.dot", "w") as f:
             f.write(self.cfg)
+            f.close()
+        with open("sdg.dot", "w") as f:
+            f.write(self.sdg)
             f.close()
         self.HTML +=f"""
             </code></pre>
@@ -661,6 +671,7 @@ class MyInterpreter(Interpreter):
         return retorno
         
     def instrucao(self, tree):
+        self.instC += 1
         retorno = str(self.instC) +": " 
         isF = ""
         for elemento in tree.children:
@@ -688,7 +699,6 @@ class MyInterpreter(Interpreter):
             self.sdg+=f+' -> "'+retorno+'"\n'
         self.cfgAnt = retorno
         retorno+="\n"
-        self.instC += 1
         return retorno
 
     def tipo(self, tree):
@@ -918,7 +928,6 @@ class MyInterpreter(Interpreter):
                 
     def selecao(self,tree):
         retorno = str(self.instC)+": " 
-        self.instC += 1
         se = False
         senao = False
         c = 0
@@ -940,8 +949,9 @@ class MyInterpreter(Interpreter):
                     inicioIF = retorno
                     # instrucao then
                     entao = str(self.instC)+": ENTAO"
+                    # atribuir txt a instrucao then
+                    self.sdg += '"'+entao+'" [label="ENTAO"]\n'
                     self.sdgFunc.append(entao)
-                    self.instC += 1
                     # instrucao else no CFG
                     self.cfg+= '"'+inicioIF + '" -> "'+entao +'"\n'
                     # instrucao else no SDG
@@ -953,7 +963,8 @@ class MyInterpreter(Interpreter):
                 elif (elemento.data == 'senao'):
                     # instrucao else
                     senao = str(self.instC)+": SENAO"
-                    self.instC += 1
+                    # atribuir txt a instrucao then
+                    self.sdg += '"'+senao+'" [label="SENAO"]\n'
                     # instrucao else no CFG
                     self.cfg+= '"'+inicioIF + '" -> "'+senao +'"\n'
                     # instrucao else no SDG
@@ -1004,9 +1015,7 @@ class MyInterpreter(Interpreter):
             self.sdgFunc.pop()
             # pop do if no SDG
             self.sdgFunc.pop()
-
             ex = str(self.instC)+": SAIR_SE"
-            self.instC += 1
             self.cfg+= '"'+self.cfgAnt + '" -> "' + ex + '"\n'
             if senao:
                 self.cfg+= '"'+ant + '" -> "' + ex + '"\n'
@@ -1027,7 +1036,6 @@ class MyInterpreter(Interpreter):
 
     def senao(self,tree):
         newIt = str(self.instC)+": SENAO "
-        self.instC += 1
         self.cfg+= '"'+self.cfgAnt + '" -> "' + newIt + '"\n'
         self.cfgAnt = newIt
         for elemento in tree.children:
@@ -1060,8 +1068,9 @@ class MyInterpreter(Interpreter):
                         self.cfg += '"'+ self.cfgAnt + '" -> "' + str(self.instC) + ': ' + retorno + '"\n'
                         self.cfg += '"'+ str(self.instC) + ": " + re.sub("\n", "", retorno) + '" [shape=diamond]\n'
                         self.cfgAnt = str(self.instC) + ": " + retorno
+                        self.sdg += self.getSDGFunc()+' -> "'+self.cfgAnt+'"\n'
                         inicioCiclo = self.cfgAnt
-                        #self.instC += 1
+                        self.sdgFunc.append(self.cfgAnt)
                         enquanto = False
                     if(ate):
                         print(inicioDoWhile)
@@ -1071,30 +1080,28 @@ class MyInterpreter(Interpreter):
                         self.cfg += '"'+ str(self.instC) + ": ATE " + re.sub("\n", "", retorno) + '" -> "' + re.sub("\n", "", inicioDoWhile) + '"\n'
                         self.cfg += '"'+ str(self.instC) + ": ATE " + re.sub("\n", "", retorno) + '" [shape=diamond]\n'
                         self.cfgAnt = str(self.instC) + ": ATE "  + retorno
-                        #self.instC += 1
+                        # id [label="Texto"]
+                        self.sdg += self.getSDGFunc()+' [label="'+self.getSDGFunc().split('"')[1]+': repetir ... ate '+re.sub("\n", "", retorno)+'"]\n'
                         ate = False
                         endAte = True
                 elif(elemento.data == 'componente'):
                     if(fazer):
                         self.visit(elemento)
-                        fazer = False
                     if(repetir):
                         anterior = self.cfgAnt
                         retorno  = self.visit(elemento)
                         #self.cfg += '"'+ anterior + '" -> "' + re.sub("\n", "", retorno) + '"\n' # esta linha está a escrever em dplicado em algum sitio
                         inicioDoWhile = retorno
                         self.cfgAnt = retorno
-                        #self.instC += 1
-                        repetir = False
                 elif (elemento.data == 'interv'):
                     if(para):
                         retorno += self.visit(elemento) + " "
                         self.cfg += '"'+ self.cfgAnt + '" -> "' + str(self.instC) + ': ' + retorno + '"\n'
                         self.cfg += '"'+ str(self.instC) + ": " + retorno + '" [shape=diamond]\n'
                         self.cfgAnt = str(self.instC) + ": " + retorno
+                        self.sdg += self.getSDGFunc()+' -> "'+self.cfgAnt+'"\n'
                         inicioCiclo = self.cfgAnt
-                        #self.instC += 1
-                        para = False
+                        self.sdgFunc.append(self.cfgAnt)
             else:
                 id = elemento.value
                 retorno += id + " "
@@ -1103,6 +1110,9 @@ class MyInterpreter(Interpreter):
                     enquanto = True
                     self.pushEc("do")
                 elif (elemento.type == 'REPETIR'):
+                    repI = str(self.instC)
+                    self.sdg += self.getSDGFunc()+' -> '+repI+'\n'
+                    self.sdgFunc.append(repI)
                     repetir = True
                     self.pushEc("while")
                 elif (elemento.type == 'PARA'):
@@ -1122,6 +1132,7 @@ class MyInterpreter(Interpreter):
                         self.cfgAnt = inicioCiclo
                         self.HTML += " <br> <br>"
         self.popEc()
+        self.sdgFunc.pop()
         return retorno
                 
     def retorno(self, tree):
@@ -1300,7 +1311,6 @@ f = open('testeSDG.txt', 'r')
 #f = open('linguagem2.txt', 'r')
 frase = f.read()
 f.close()
-
 
 p = Lark(grammar)
 p = Lark(grammar)
