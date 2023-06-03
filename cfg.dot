@@ -15,11 +15,11 @@ digraph G {
 "11: enquanto 1  >= 1   " [shape=diamond]
 "11: enquanto 1  >= 1   " -> "11:  int e = 1 - 17    ;  "
 "11:  int e = 1 - 17    ;  " -> "11: enquanto 1  >= 1   "
-"11: enquanto 1  >= 1   " -> "13: devolve e  ; "
-"13: devolve e  ; " -> "Exit_divisivel"
-"0:  int final2 = 3    ;  " -> "14:  int valor = 4    ;  "
-"Entry_main" -> "15:  bool teste = divisivel( a   )     ;  "
-"15:  bool teste = divisivel( a   )     ;  " -> "16:  bool teste2 = maior( b   ,  a   )     ;  "
-"16:  bool teste2 = maior( b   ,  a   )     ;  " -> Exit_main
-"14:  int valor = 4    ;  " -> "17:  int final = 10    ;  "
+"11: enquanto 1  >= 1   " -> "13:  bool teste2 = maior( b   ,  a   )     ;  "
+"13:  bool teste2 = maior( b   ,  a   )     ;  " -> "14: devolve teste2  ; "
+"14: devolve teste2  ; " -> "Exit_divisivel"
+"0:  int final2 = 3    ;  " -> "15:  int valor = 4    ;  "
+"Entry_main" -> "16:  bool teste = divisivel( a   )     ;  "
+"16:  bool teste = divisivel( a   )     ;  " -> Exit_main
+"15:  int valor = 4    ;  " -> "17:  int final = 10    ;  "
 }

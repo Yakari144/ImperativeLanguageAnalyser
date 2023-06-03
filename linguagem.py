@@ -547,27 +547,56 @@ class MyInterpreter(Interpreter):
         funcoes = {}
         for line in lines:
             if "Entry" in line:
-                if line.split("->")[0] not in funcoes.keys():
-                    funcoes[line.split("->")[0]] = {}
-        
+                if "Entry" in line.split("->")[0]:
+                    if line.split("->")[0] not in funcoes.keys():
+                        key = re.sub(" ", "", line.split("->")[0])
+                        funcoes[key] = {}
+                if "Entry" in line.split("->")[1]:
+                    if line.split("->")[1] not in funcoes.keys():
+                        key = re.sub("\n", " ", line.split("->")[1])
+                        key = re.sub(" ", "", key)
+                        funcoes[key] = {}
+                    
         antigo = ""
         for line in lines:
-            if(line.split("->")[0] and line.split("->")[1] in funcoes.keys()):
-                pass
-            elif line.split("->")[0] in funcoes.keys():
-                if "arestas" not in funcoes[line.split("->")[0]].keys():
-                    funcoes[line.split("->")[0]]["arestas"] = 1
+            key1 = re.sub(" ", "", line.split("->")[0])
+            key2 = re.sub("\n", " ", line.split("->")[1])
+            key2 = re.sub(" ", "", key2)
+            if key1 in funcoes.keys():
+                if "arestas" not in funcoes[key1].keys():
+                    funcoes[key1]["arestas"] = 1
                 else:
-                    funcoes[line.split("->")[0]]["arestas"] += 1
-                antigo = line.split("->")[0]
+                    funcoes[key1]["arestas"] += 1
+                if "nodos" not in funcoes[key1].keys():
+                    funcoes[key1]["nodos"] = [key2]
+                else:
+                    if key2 not in funcoes[key1]["nodos"]:
+                        funcoes[key1]["nodos"].append(key2)
+                
+                antigo = key1
+            elif key1 and key2 not in funcoes.keys():
+                if "nodos" not in funcoes[antigo].keys():
+                    funcoes[antigo]["nodos"] = [key1, key2]
+                    funcoes[antigo]["arestas"] += 1
+                else:
+                    if key1 not in funcoes[antigo]["nodos"]:
+                        funcoes[antigo]["nodos"].append(key1)
+                    if key2 not in funcoes[antigo]["nodos"]:
+                        funcoes[antigo]["nodos"].append(key2)
+                    funcoes[antigo]["arestas"] += 1
+
             else :
                 if "arestas" not in funcoes[antigo].keys():
                     funcoes[antigo]["arestas"] = 1
                 else:
                     funcoes[antigo]["arestas"] += 1
-                    
-        print("Diccionario de funcoes: " + str(funcoes))
-            
+                
+        
+        for key in funcoes.keys():
+            print("Funcao: " + key)
+            print("\tNodos: " + str(funcoes[key]["nodos"]))
+            print("\tArestas: " + str(funcoes[key]["arestas"]))
+
 #####################################################
 ################ Interpreter methods ################
 #####################################################
