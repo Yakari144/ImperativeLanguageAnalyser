@@ -110,6 +110,7 @@
             
             .container {
                 display: flex;
+                overflow-x: auto;
             }
 
             .left-container,
@@ -177,10 +178,11 @@
 
                 <span class="naoUsada">Cor -</span> <span class="code"> Não-Utilizada </span> <br/> 
  
-        <br/><span class="code"> int </span><span class="naoUsada" id="None-final2"> final2 </span><span class="code"> = </span><span class="code"> 3 </span><span class="code"> ; </span> <br/> <br/><span class="def"> def </span><span class="code"> int </span><span class="funcName"> maior</span> <span class="code"> ( </span><span class="code"> int </span><span class="code" id="maior-num1">num1 </span><span class="code">, </span><span class="code"> int </span><span class="code" id="maior-num2">num2 </span><span class="code"> ) </span><span class="code"> { </span> <br/> <br/>	<span class="code"> int </span><span class="code" id="maior-maior"> maior </span><span class="code"> ; </span> <br/> <br/>	<span class="ciclo"> se </span><span class="code" id="maior-num1"> num1 </span><span class="code"> &gt;= </span><span class="code" id="maior-num2"> num2 </span><span class="code"> { </span> <br/> <br/>		<span class="code" id="maior-maior">maior </span><span class="code" id="maior-num1"> num1 </span><span class="code"> ; </span> <br/> <br/><span class="ciclo"> senao </span><span class="code" id="maior-maior">maior </span><span class="code" id="maior-num2"> num2 </span><span class="code"> ; </span> <br/> <br/>	<span class="code"> } </span> <br/> <br/>	<span class="retornos"> devolve </span><span class="code" id="maior-maior"> maior </span><span class="code"> ; </span> <br/> <br/>	<span class="code"> } </span> <br/> 
-<span class="def"> def </span><span class="code"> bool </span><span class="funcName"> divisivel</span> <span class="code"> ( </span><span class="code"> int </span><span class="code" id="divisivel-a">a </span><span class="code"> ) </span><span class="code"> { </span> <br/> <br/>	<span class="ciclo"> enquanto </span><span class="code"> 1 </span><span class="code"> &gt;= </span><span class="code"> 1 </span><span class="ciclo"> fazer </span>			<span class="code"> int </span><span class="naoUsada" id="divisivel-e"> e </span><span class="code"> = </span><span class="code"> 1 </span><span class="code"> - </span><span class="code"> 17 </span><span class="code"> ; </span> <br/> <br/><span class="ciclo"> end </span> <br/> <br/>		<span class="code"> bool </span><span class="code" id="divisivel-teste2"> teste2 </span><span class="code"> = </span><span class="funcName" id="divisivel-maior"> maior </span> <span class="code">(</span><span class="naoDeclaracao"> b </span><span class="code">, </span><span class="code" id="divisivel-a"> a </span><span class="code"> ) </span><span class="code"> ; </span> <br/> <br/>		<span class="retornos"> devolve </span><span class="code" id="divisivel-teste2"> teste2 </span><span class="code"> ; </span> <br/> <br/>		<span class="code"> } </span> <br/> 
-	<span class="code"> int </span><span class="naoUsada" id="None-valor"> valor </span><span class="code"> = </span><span class="code"> 4 </span><span class="code"> ; </span> <br/> <br/>	<span class="def"> def </span><span class="code"> int </span><span class="funcName"> main</span> <span class="code"> ( </span><span class="code"> int </span><span class="code" id="main-a">a </span><span class="code">, </span><span class="code"> int </span><span class="naoUsada" id="main-b">b </span><span class="code"> ) </span><span class="code"> { </span> <br/> <br/>		<span class="code"> bool </span><span class="naoUsada" id="main-teste"> teste </span><span class="code"> = </span><span class="funcName" id="main-divisivel"> divisivel </span> <span class="code">(</span><span class="code" id="main-a"> a </span><span class="code"> ) </span><span class="code"> ; </span> <br/> <br/>		<span class="code"> } </span> <br/> 
-	<span class="code"> int </span><span class="naoUsada" id="None-final"> final </span><span class="code"> = </span><span class="code"> 10 </span><span class="code"> ; </span> <br/> <br/>
+        <br/><span class="code"> int </span><span class="naoUsada" id="None-final2"> final2 </span><span class="code"> = </span><span class="code"> 3 </span><span class="code"> ; </span> <br/> <br/><span class="def"> def </span><span class="code"> int </span><span class="funcName"> maior</span> <span class="code"> ( </span><span class="code"> int </span><span class="code" id="maior-num1">num1 </span><span class="code">, </span><span class="code"> int </span><span class="code" id="maior-num2">num2 </span><span class="code"> ) </span><span class="code"> { </span> <br/> <br/>	<span class="code"> int </span><span class="code" id="maior-maior"> maior </span><span class="code"> ; </span> <br/> <br/>	<span class="ciclo"> se </span><span class="code" id="maior-num1"> num1 </span><span class="code"> &gt;= </span><span class="code" id="maior-num2"> num2 </span><span class="code"> { </span> <br/> <br/>		<span class="code" id="maior-a">a </span><span class="code"> 3 </span><span class="code"> ; </span> <br/> <br/>		<span class="code" id="maior-maior">maior </span><span class="code" id="maior-num1"> num1 </span><span class="code"> ; </span> <br/> <br/><span class="ciclo"> senao </span><span class="code" id="maior-a">a </span><span class="code"> 2 </span><span class="code"> ; </span> <br/> <br/><span class="code" id="maior-maior">maior </span><span class="code" id="maior-num2"> num2 </span><span class="code"> ; </span> <br/> <br/>	<span class="code"> } </span> <br/> <br/>	<span class="retornos"> devolve </span><span class="code" id="maior-maior"> maior </span><span class="code"> ; </span> <br/> <br/>	<span class="code"> } </span> <br/> 
+<span class="def"> def </span><span class="code"> bool </span><span class="funcName"> divisivel</span> <span class="code"> ( </span><span class="code"> int </span><span class="naoUsada" id="divisivel-a">a </span><span class="code"> ) </span><span class="code"> { </span> <br/> <br/>	<span class="ciclo"> enquanto </span><span class="code"> 1 </span><span class="code"> &gt;= </span><span class="code"> 1 </span><span class="ciclo"> fazer </span>			<span class="code"> int </span><span class="naoUsada" id="divisivel-e"> e </span><span class="code"> = </span><span class="code"> 1 </span><span class="code"> - </span><span class="code"> 17 </span><span class="code"> ; </span> <br/> <br/><span class="ciclo"> end </span> <br/> <br/>		<span class="retornos"> devolve </span><span class="naoDeclaracao"> eg </span><span class="code"> ; </span> <br/> <br/>		<span class="code"> } </span> <br/> 
+	<span class="def"> def </span><span class="code"> int </span><span class="funcName"> complexo</span> <span class="code"> ( </span><span class="code"> int </span><span class="code" id="complexo-a">a </span><span class="code"> ) </span><span class="code"> { </span> <br/> <br/>		<span class="ciclo"> enquanto </span><span class="code">!a </span><span class="ciclo"> fazer </span>				<span class="code"> int </span><span class="naoUsada" id="complexo-e"> e </span><span class="code"> = </span><span class="code"> 2 </span><span class="code"> ; </span> <br/> <br/><span class="ciclo"> end </span> <br/> <br/>			<span class="code"> } </span> <br/> 
+		<span class="code"> int </span><span class="naoUsada" id="None-valor"> valor </span><span class="code"> = </span><span class="code"> 4 </span><span class="code"> ; </span> <br/> <br/>		<span class="def"> def </span><span class="code"> int </span><span class="funcName"> main</span> <span class="code"> ( </span><span class="code"> int </span><span class="naoUsada" id="main-a">a </span><span class="code">, </span><span class="code"> int </span><span class="naoUsada" id="main-b">b </span><span class="code"> ) </span><span class="code"> { </span> <br/> <br/>			<span class="code"> bool </span><span class="naoUsada" id="main-teste"> teste </span><span class="code"> = </span><span class="code"> 4 </span><span class="code"> ; </span> <br/> <br/>			<span class="code"> } </span> <br/> 
+		<span class="funcName" id="None-divisivel"> divisivel </span> <span class="code">(</span><span class="code"> 4 </span><span class="code"> ) </span><span class="code"> ; </span> <br/> <br/>		<span class="funcName" id="None-main"> main </span> <span class="code">(</span><span class="code"> 3 </span><span class="code">, </span><span class="code"> 4 </span><span class="code"> ) </span><span class="code"> ; </span> <br/> <br/>		<span class="code"> int </span><span class="naoUsada" id="None-final"> final </span><span class="code"> = </span><span class="code"> 10 </span><span class="code"> ; </span> <br/> <br/>
             </code></pre>
 <h3>Estatisticas</h3>
 <table>
@@ -188,10 +190,10 @@
 <th> </th><th> </th>
 </tr>
 <tr><td><span>Variáveis já declaradas:</span></td><td> 0</td></tr>
-<tr><td><span>Variáveis não declaradas:</span></td><td> 1</td></tr>
-<tr><td><span>Variáveis não utilizadas:</span></td><td> 3</td></tr>
+<tr><td><span>Variáveis não declaradas:</span></td><td> 3</td></tr>
+<tr><td><span>Variáveis não utilizadas:</span></td><td> 6</td></tr>
 <tr><td><span>Variáveis não inicializadas:</span></td><td> 0</td></tr>
-<tr><td><span>Variáveis do tipo int:</span></td><td> 10</td></tr><tr><td><span>Variáveis do tipo bool:</span></td><td> 2</td></tr><tr><td><span>Total de variaveis:</span></td><td> 12</td></tr><tr><td><span>SE's dentro de SE's:</span></td><td>   0</td></tr><tr><td><span>SE's dentro de REP's:</span></td><td>  0</td></tr><tr><td><span>REP's dentro de SE's:</span></td><td>  0</td></tr><tr><td><span>REP's dentro de REP's:</span></td><td> 1</td></tr>
+<tr><td><span>Variáveis do tipo int:</span></td><td> 12</td></tr><tr><td><span>Variáveis do tipo bool:</span></td><td> 1</td></tr><tr><td><span>Total de variaveis:</span></td><td> 13</td></tr><tr><td><span>SE's dentro de SE's:</span></td><td>   0</td></tr><tr><td><span>SE's dentro de REP's:</span></td><td>  0</td></tr><tr><td><span>REP's dentro de SE's:</span></td><td>  0</td></tr><tr><td><span>REP's dentro de REP's:</span></td><td> 3</td></tr>
 </table></div>
 <div class="right-container">
 <h2 class="code">Grafos de fluxo de controlo</h2>
@@ -205,6 +207,27 @@
 <a href="sdgImage.jpg" target="_blank">
 <img alt="Image" draggable="false" onmousedown="startPan(event)" onmousemove="panImage(event)" onmouseout="endPan()" onmouseup="endPan()" src="sdgImage.jpg"/>
 </a>
+</div><div><h3>Complexidade de McCabe</h3><span> Função "Entry_maior"</span> <br/><pre>
+                    	Nodos: 9
+                    	Arestas: 9
+                    	Complexidade de McCabe: 2
+                </pre><span> Função "Entry_divisivel"</span> <br/><pre>
+                    	Nodos: 2
+                    	Arestas: 2
+                    	Complexidade de McCabe: 2
+                </pre><span> Função "Entry_complexo"</span> <br/><pre>
+                    	Nodos: 1
+                    	Arestas: 1
+                    	Complexidade de McCabe: 2
+                </pre><span> Função Entry_GLOBAL</span> <br/><pre>
+                    	Nodos: 6
+                    	Arestas: 6
+                    	Complexidade de McCabe: 2
+                </pre><span> Função "Entry_main"</span> <br/><pre>
+                    	Nodos: 1
+                    	Arestas: 1
+                    	Complexidade de McCabe: 2
+                </pre><span> Grafos de Ilha </span> <br/><span>	['"Entry_maior"', '"Entry_complexo"']</span> <br/>
 </div>
 </div>
 </div></body>

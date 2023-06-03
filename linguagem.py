@@ -413,6 +413,7 @@ class MyInterpreter(Interpreter):
             
             .container {
                 display: flex;
+                overflow-x: auto;
             }
 
             .left-container,
@@ -543,7 +544,7 @@ class MyInterpreter(Interpreter):
         file.close()
         del lines[0]       # Delete the first element
         del lines[-1] 
-        
+
         funcoes = {}
         for line in lines:
             if "Entry" in line:
@@ -556,7 +557,10 @@ class MyInterpreter(Interpreter):
                         key = re.sub("\n", " ", line.split("->")[1])
                         key = re.sub(" ", "", key)
                         funcoes[key] = {}
-                    
+        
+        entries = funcoes.keys()
+        entries = list(entries)
+        entries.remove("Entry_GLOBAL")         
         antigo = ""
         for line in lines:
             key1 = re.sub(" ", "", line.split("->")[0])
@@ -584,19 +588,29 @@ class MyInterpreter(Interpreter):
                     if key2 not in funcoes[antigo]["nodos"]:
                         funcoes[antigo]["nodos"].append(key2)
                     funcoes[antigo]["arestas"] += 1
-
             else :
                 if "arestas" not in funcoes[antigo].keys():
                     funcoes[antigo]["arestas"] = 1
                 else:
                     funcoes[antigo]["arestas"] += 1
-                
-        
+            if key1 == "Entry_GLOBAL":
+                if key2 in funcoes.keys():
+                    entries.remove(key2)    
+        self.HTML += "</div><div><h3>Complexidade de McCabe</h3>"
         for key in funcoes.keys():
+            self.HTML += "<span> Função " + key + "</span> <br>"
+            self.HTML += f'''<pre>
+                    \tNodos: {len(funcoes[key]["nodos"])}
+                    \tArestas: {funcoes[key]["arestas"]}
+                    \tComplexidade de McCabe: {funcoes[key]["arestas"] - len(funcoes[key]["nodos"]) + 2}
+                </pre>'''
             print("Funcao: " + key)
             print("\tNodos: " + str(funcoes[key]["nodos"]))
             print("\tArestas: " + str(funcoes[key]["arestas"]))
-
+            print("\tComplexidade de McCabe: " + str((funcoes[key]["arestas"]) - len(funcoes[key]["nodos"]) + 2))
+        self.HTML += "<span> Grafos de Ilha </span> <br>"
+        self.HTML += "<span>\t" + str(entries) + "</span> <br>"
+        print("Grafos de Ilha: " + str(entries))
 #####################################################
 ################ Interpreter methods ################
 #####################################################
@@ -638,7 +652,6 @@ class MyInterpreter(Interpreter):
         with open("sdg.dot", "w") as f:
             f.write(self.sdg)
             f.close()
-        self.complexidadeMcCabes()
         self.HTML +=f"""
             </code></pre>
             <h3>Estatisticas</h3>
@@ -672,6 +685,7 @@ class MyInterpreter(Interpreter):
         print("Total de variáveis: " + str(t))
         self.countEc()
         self.geraGrafos()
+        self.complexidadeMcCabes()
         self.htmlEnd()
         self.updateHTML()
         

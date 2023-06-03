@@ -1,16 +1,20 @@
 0:  int final2 = 3    ;  
  def  int  maior(  int num1  ,  int num2   ) {
 1:  int maior  ;  
-8: SAIR_SE
-10: devolve maior  ; 
+10: SAIR_SE
+12: devolve maior  ; 
 }
   def  bool  divisivel(  int a   ) {
-11: enquanto 1  >= 1   
-13:  bool teste2 = maior( b   ,  a   )     ;  
-14: devolve teste2  ; 
+13: enquanto 1  >= 1   
+15: devolve eg  ; 
 }
- 15:  int valor = 4    ;  
+  def  int  complexo(  int a   ) {
+16: enquanto !a  
+}
+ 18:  int valor = 4    ;  
  def  int  main(  int a  ,  int b   ) {
-16:  bool teste = divisivel( a   )     ;  
+19:  bool teste = 4    ;  
 }
- 17:  int final = 10    ;  
+ 20: divisivel( 4   )   ;  
+21: main( 3   ,  4   )   ;  
+22:  int final = 10    ;  
