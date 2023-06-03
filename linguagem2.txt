@@ -1,64 +1,39 @@
-/* variavel sem utilizacao */  
-string  varInt  ;  
-
-/* variavel sem atribuicao */
-bool funcV2;
-
-tuplo  a  ;  
-
-/* variavel já declarada */
-int a = 2  *  4  ;  
-
-/* variavel 'v' nao declarada */
-myTeste2  ( a ,  v  , funcV2)  ; 
-
-def  int  myTeste  (  int par2  )  {  
-    string  funcV2  =  "texto"  ;  
-    array teste = [];
-    devolve  funcV2  ;  
-}  
-int  tetris  =  2  *  2  ;  
-int  b  ;  
-
-def array myTeste2  (  int par  )  {  
-    /* variavel 'teste' declarada na funcao myTeste */
-    array teste2 = [];
-    devolve  teste  ;
-}
-
-myTeste  ( b  )  ;
 
 
-se b > 1 {
-    string k;
-    se c < 3 {
-        int sE;
+
+int final2 = 3;
+
+def  int  maior (  int num1, int num2 )  {  
+    int maior;
+    se num1 >= num2 {
+       maior = num1;
     }
-}senao{
-    int sEnao;
+    senao {
+       maior = num2;
+    } 
+    devolve maior;
+}  
+
+def bool divisivel (int a) {
+    
+    enquanto 1 >= 1 
+    fazer 
+        int e = 1 -17;
+        tuplo eg = (e,g); 
+    end
+
+    devolve e;
+}
+
+int valor = 4;
+
+
+def int main(int a, int b) {
+
+    bool teste = divisivel(a);
+    bool teste2 = maior(b, a);
+
 }
 
 
-se c < 3 {
-    int sE;
-}
-
-/* repeticao enq */
-enquanto 1 >= 1 
-fazer 
-    int e = 1 -17;
-    tuplo eg = (e,g); 
-end
-
-int besta = 3;
-
-se c < 3 {
-    int sE;
-}
-/* repeticao repetir */
-repetir a = a.snoc; ate !v end
-
-/* repeticao para */
-para [1,14] fazer a = palavra.id; end
-
-int aff = 3;
+int final = 10;

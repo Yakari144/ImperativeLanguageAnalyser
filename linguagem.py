@@ -1,3 +1,4 @@
+import os
 import re
 from lark import Lark, Token, Tree
 from lark.visitors import Interpreter
@@ -310,6 +311,9 @@ class MyInterpreter(Interpreter):
         self.HTML += ''' 
         <!DOCTYPE html>
         <html>
+        <head>
+            <title>My HTML Page</title>
+            <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
         <style>
             .error {
                 position: relative;
@@ -413,30 +417,88 @@ class MyInterpreter(Interpreter):
                 color: #818589;
             }
             
-        </style>
+            .container {
+                display: flex;
+            }
+
+            .left-container,
+            .right-container {
+                flex: 1;
+            }
+            
+            .image-container {
+  width: fit-content; /* Set the width to fit the image */
+  height: fit-content; /* Set the height to fit the image */
+  display: inline-block; /* Display the container as an inline element */
+  overflow: hidden; /* Hide any overflow of the image */
+}
+
+.image-container img {
+  display: block; /* Make the image a block element */
+  max-width: 100%; /* Limit the image width to the container's width */
+  cursor: grab; /* Show a grab cursor when hovering over the image */
+}
+
+        .image-container img:active {
+            cursor: grabbing; /* Show a grabbing cursor when the image is clicked */
+        }
+    </style>
+    <script>
+        var isMouseDown = false;
+        var startX, startY, scrollLeft, scrollTop;
+
+        function startPan(event) {
+            isMouseDown = true;
+            startX = event.clientX - event.target.offsetLeft;
+            startY = event.clientY - event.target.offsetTop;
+            scrollLeft = event.target.scrollLeft;
+            scrollTop = event.target.scrollTop;
+        }
+
+        function endPan() {
+            isMouseDown = false;
+        }
+
+        function panImage(event) {
+            if (!isMouseDown) return;
+            event.preventDefault();
+            var img = event.target;
+            var offsetX = event.clientX - img.offsetLeft;
+            var offsetY = event.clientY - img.offsetTop;
+            var deltaX = offsetX - startX;
+            var deltaY = offsetY - startY;
+            img.scrollLeft = scrollLeft - deltaX;
+            img.scrollTop = scrollTop - deltaY;
+        }
+    </script>
+</head>
         <body class="graficos">
-            <h2 class="code">Análise de código</h2>
-            <pre><code>
-            <h3 class="code">Instruções de Análise - Variáveis</h3>
-            <span class="redeclaracao">Cor -</span> <span class="code"> Redeclaração </span> <br> \n
-            <span class="naoDeclaracao">Cor -</span> <span class="code"> Não-Declaração </span> <br> \n
-            <span class="naoInicializada">Cor -</span> <span class="code"> Não-Inicializada </span> <br> \n
-            <span class="naoUsada">Cor -</span> <span class="code"> Não-Utilizada </span> <br> \n
+        <div class="container">
+            <div class="left-container">
+                <h2 class="code">Análise de código</h2>
+                <pre><code>
+                <h3 class="code">Instruções de Análise - Variáveis</h3>
+                <span class="redeclaracao">Cor -</span> <span class="code"> Redeclaração </span> <br> \n
+                <span class="naoDeclaracao">Cor -</span> <span class="code"> Não-Declaração </span> <br> \n
+                <span class="naoInicializada">Cor -</span> <span class="code"> Não-Inicializada </span> <br> \n
+                <span class="naoUsada">Cor -</span> <span class="code"> Não-Utilizada </span> <br> \n 
         '''
-    
+
     def htmlEnd(self):
         self.HTML += '''
+        </div>
+        </div>
         </body>
         </html>
         '''
-    
+
     def writeHTML(self):
         f = open("output.html", "w")
         f.write(self.HTML)
 
     def updateHTML(self):
         varsUnnused = []
-        
+
         for x in self.variaveis.keys():
             for y in self.variaveis[x]:
                 if y['usada'] == False:
@@ -444,24 +506,74 @@ class MyInterpreter(Interpreter):
                         varsUnnused.append("None-" + y['nome'])
                     else:
                         varsUnnused.append(x + "-" + y['nome'])
-        
-        #for t in varsUnnused:
+
+        # for t in varsUnnused:
         #    print("Variável --> " + t + " não utilizada")
-        
+
         soup = BeautifulSoup(self.HTML, 'html.parser')
-        
-        
+
         for var in varsUnnused:
             for x in soup.find_all('span', id=var):
                 x['class'] = 'naoUsada'
             self.HTML = str(soup)
-           
+
+    def geraGrafos(self):
+        os.system("dot -Tpng -o cfgImage.jpg cfg.dot")
+        os.system("dot -Tpng -o sdgImage.jpg sdg.dot")
+        self.HTML += '''
+        </div>
+        <div class="right-container">
+        <h2 class="code">Grafos de fluxo de controlo</h2>
+        <div class="image-container w3-card-4">
+        <a href="cfgImage.jpg" target="_blank">
+            <img src="cfgImage.jpg" alt="Image" onmousedown="startPan(event)" onmouseup="endPan()" onmousemove="panImage(event)" onmouseout="endPan()" draggable="false">
+        </a>
+        </div>
+        <h2 class="code">Grafos de dependências de controlo</h2>
+        <div class="image-container w3-card-4">
+        <a href="sdgImage.jpg" target="_blank">
+            <img src="sdgImage.jpg" alt="Image" onmousedown="startPan(event)" onmouseup="endPan()" onmousemove="panImage(event)" onmouseout="endPan()" draggable="false">
+        </a>
+        '''
+
     def getSDGFunc(self):
         r = 'Entry_GLOBAL'
         if len(self.sdgFunc) > 0:
             r = "\""+self.sdgFunc[-1]+"\""
         return r
     
+    def complexidadeMcCabes(self):
+        file_path = "sdg.dot"  # Replace with your file path
+        file = open(file_path, "r")
+        lines = file.readlines()
+        file.close()
+        del lines[0]       # Delete the first element
+        del lines[-1] 
+        
+        funcoes = {}
+        for line in lines:
+            if "Entry" in line:
+                if line.split("->")[0] not in funcoes.keys():
+                    funcoes[line.split("->")[0]] = {}
+        
+        antigo = ""
+        for line in lines:
+            if(line.split("->")[0] and line.split("->")[1] in funcoes.keys()):
+                pass
+            elif line.split("->")[0] in funcoes.keys():
+                if "arestas" not in funcoes[line.split("->")[0]].keys():
+                    funcoes[line.split("->")[0]]["arestas"] = 1
+                else:
+                    funcoes[line.split("->")[0]]["arestas"] += 1
+                antigo = line.split("->")[0]
+            else :
+                if "arestas" not in funcoes[antigo].keys():
+                    funcoes[antigo]["arestas"] = 1
+                else:
+                    funcoes[antigo]["arestas"] += 1
+                    
+        print("Diccionario de funcoes: " + str(funcoes))
+            
 #####################################################
 ################ Interpreter methods ################
 #####################################################
@@ -503,6 +615,7 @@ class MyInterpreter(Interpreter):
         with open("sdg.dot", "w") as f:
             f.write(self.sdg)
             f.close()
+        self.complexidadeMcCabes()
         self.HTML +=f"""
             </code></pre>
             <h3>Estatisticas</h3>
@@ -535,7 +648,7 @@ class MyInterpreter(Interpreter):
         self.HTML += f"<tr><td><span>Total de variaveis:</td><td> {str(t)}</span></td></tr>"
         print("Total de variáveis: " + str(t))
         self.countEc()
-
+        self.geraGrafos()
         self.htmlEnd()
         self.updateHTML()
         
@@ -1307,8 +1420,8 @@ class MyInterpreter(Interpreter):
                     self.HTML += "<span class='code'> false </span>"
         return retorno
         
-f = open('testeSDG.txt', 'r')
-#f = open('linguagem2.txt', 'r')
+#f = open('testeSDG.txt', 'r')
+f = open('linguagem2.txt', 'r')
 frase = f.read()
 f.close()
 
