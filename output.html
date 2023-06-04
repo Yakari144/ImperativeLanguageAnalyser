@@ -1,18 +1,10 @@
-<<<<<<< HEAD
  
         <!DOCTYPE html>
         <html>
+        <head>
+            <title>My HTML Page</title>
+            <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
         <style>
-=======
-
-<!DOCTYPE html>
-
-<html>
-<head>
-<title>My HTML Page</title>
-<link href="https://www.w3schools.com/w3css/4/w3.css" rel="stylesheet"/>
-<style>
->>>>>>> 2e99b775bf092f770793074c5684bbc36f31b082
             .error {
                 position: relative;
                 display: inline-block;
@@ -42,6 +34,12 @@
                 position: relative;
                 display: inline-block;
                 color: #CB692B;
+            }
+
+            .ciclo.juncao {
+                position: relative;
+                display: inline-block;
+                color: #ffff00;
             }
             
             .retornos {
@@ -115,36 +113,6 @@
                 color: #818589;
             }
             
-        </style>
-        <body class="graficos">
-            <h2 class="code">Análise de código</h2>
-            <pre><code>
-            <h3 class="code">Instruções de Análise - Variáveis</h3>
-            <span class="redeclaracao">Cor -</span> <span class="code"> Redeclaração </span> <br> 
-
-            <span class="naoDeclaracao">Cor -</span> <span class="code"> Não-Declaração </span> <br> 
-
-            <span class="naoInicializada">Cor -</span> <span class="code"> Não-Inicializada </span> <br> 
-
-            <span class="naoUsada">Cor -</span> <span class="code"> Não-Utilizada </span> <br> 
-
-        <br><span class='def'> def </span><span class='code'> int </span><span class='funcName'> main</span> <span class='code'> ( </span><span class='code'> ) </span><span class='code'> { </span> <br> <br>	<span class='code'> /* vai ter um ciclo while */ </span> <br>	<span class='ciclo'> enquanto </span><span class='naoDeclaracao'> i </span><span class='code'> < </span><span class='code'> 10 </span><span class='ciclo'> fazer </span>			<span class='code' id ='main-i'>i </span><span class='code'> 4 </span><span class='code'> + </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br>			<span class='code' id ='main-k'>k </span><span class='code'> \"nao funfa\" </span><span class='code'> ; </span> <br> <br><span class='ciclo'> end </span> <br> <br>		<span class='code'> /* vai ter um ciclo for */ </span> <br>		<span class='ciclo'> para </span><span class='code'> [ </span><span class='code'> 1 </span><span class='code'>, </span><span class='code'> 10 </span><span class='code'> ] </span><span class='ciclo'> fazer </span>				<span class='code' id ='main-para'>para </span><span class='code'> 14 </span><span class='code'> ; </span> <br> <br>				<span class='code' id ='main-a'>a </span><span class='code'> 14 </span><span class='code'> ; </span> <br> <br><span class='ciclo'> end </span> <br> <br>			<span class='code'> /* vai ter um ciclo do while */ </span> <br>			<span class='ciclo'> repetir </span>				<span class='code' id ='main-i'>i </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br>				<span class='code' id ='main-k'>k </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br><span class='ciclo'> ate </span><span class='naoDeclaracao'> i </span><span class='code'> > </span><span class='code'> 0 </span><span class='ciclo'> end </span>				<span class='code'> /* vai ter um if */ </span> <br>				<span class='ciclo'> se </span><span class='naoDeclaracao'> i </span><span class='code'> > </span><span class='code'> 0 </span><span class='code'> { </span> <br> <br>					<span class='code' id ='main-i'>i </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br>					<span class='code' id ='main-n'>n </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br>				<span class='code'> } </span> <br> <br>				<span class='code'> /* vai ter um if else */ </span> <br>				<span class='ciclo'> se </span><span class='naoDeclaracao'> i </span><span class='code'> > </span><span class='code'> 0 </span><span class='code'> { </span> <br> <br>					<span class='code' id ='main-i'>i </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br>					<span class='code' id ='main-n'>n </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br><span class='ciclo'> senao </span><span class='code' id ='main-i'>i </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br><span class='code' id ='main-n'>n </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br>				<span class='code'> } </span> <br> <br>				<span class='code'> /* vai ter um caso */ </span> <br>				<span class='code'> } </span> <br> 
-
-            </code></pre>
-            <h3>Estatisticas</h3>
-            <table>
-            <tr>
-                <th>  </th><th>  </th>
-                </tr>
-                <tr><td><span>Variáveis já declaradas:</td><td> 0</span></td></tr>
-                <tr><td><span>Variáveis não declaradas:</td><td> 16</span></td></tr>
-                <tr><td><span>Variáveis não utilizadas:</td><td> 0</span></td></tr>
-                <tr><td><span>Variáveis não inicializadas:</td><td> 0</span></td></tr>
-                
-        <tr><td><span>Total de variaveis:</td><td> 0</span></td></tr><tr><td><span>SE's dentro de SE's:</td><td>   0</span></td></tr><tr><td><span>SE's dentro de REP's:</td><td>  2</span></td></tr><tr><td><span>REP's dentro de SE's:</td><td>  0</span></td></tr><tr><td><span>REP's dentro de REP's:</td><td> 5</span></td></tr>
-        </body>
-        </html>
-        
             .container {
                 display: flex;
             }
@@ -171,7 +139,7 @@
             cursor: grabbing; /* Show a grabbing cursor when the image is clicked */
         }
     </style>
-<script>
+    <script>
         var isMouseDown = false;
         var startX, startY, scrollLeft, scrollTop;
 
@@ -200,49 +168,53 @@
         }
     </script>
 </head>
-<body class="graficos">
-<div class="container">
-<div class="left-container">
-<h2 class="code">Análise de código</h2>
-<pre><code>
+        <body class="graficos">
+        <div class="container">
+            <div class="left-container">
+                <h2 class="code">Análise de código</h2>
+                <pre><code>
                 <h3 class="code">Instruções de Análise - Variáveis</h3>
-                <span class="redeclaracao">Cor -</span> <span class="code"> Redeclaração </span> <br/> 
+                <span class="redeclaracao">Cor -</span> <span class="code"> Redeclaração </span> <br> 
 
-                <span class="naoDeclaracao">Cor -</span> <span class="code"> Não-Declaração </span> <br/> 
+                <span class="naoDeclaracao">Cor -</span> <span class="code"> Não-Declaração </span> <br> 
 
-                <span class="naoInicializada">Cor -</span> <span class="code"> Não-Inicializada </span> <br/> 
+                <span class="naoInicializada">Cor -</span> <span class="code"> Não-Inicializada </span> <br> 
 
-                <span class="naoUsada">Cor -</span> <span class="code"> Não-Utilizada </span> <br/> 
+                <span class="naoUsada">Cor -</span> <span class="code"> Não-Utilizada </span> <br> 
  
-        <br/><span class="code"> int </span><span class="naoUsada" id="None-final2"> final2 </span><span class="code"> = </span><span class="code"> 3 </span><span class="code"> ; </span> <br/> <br/><span class="def"> def </span><span class="code"> int </span><span class="funcName"> maior</span> <span class="code"> ( </span><span class="code"> int </span><span class="code" id="maior-num1">num1 </span><span class="code">, </span><span class="code"> int </span><span class="code" id="maior-num2">num2 </span><span class="code"> ) </span><span class="code"> { </span> <br/> <br/>	<span class="code"> int </span><span class="code" id="maior-maior"> maior </span><span class="code"> ; </span> <br/> <br/>	<span class="ciclo"> se </span><span class="code" id="maior-num1"> num1 </span><span class="code"> &gt;= </span><span class="code" id="maior-num2"> num2 </span><span class="code"> { </span> <br/> <br/>		<span class="code" id="maior-maior">maior </span><span class="code" id="maior-num1"> num1 </span><span class="code"> ; </span> <br/> <br/><span class="ciclo"> senao </span><span class="code" id="maior-maior">maior </span><span class="code" id="maior-num2"> num2 </span><span class="code"> ; </span> <br/> <br/>	<span class="code"> } </span> <br/> <br/>	<span class="retornos"> devolve </span><span class="code" id="maior-maior"> maior </span><span class="code"> ; </span> <br/> <br/>	<span class="code"> } </span> <br/> 
-<span class="def"> def </span><span class="code"> bool </span><span class="funcName"> divisivel</span> <span class="code"> ( </span><span class="code"> int </span><span class="naoUsada" id="divisivel-a">a </span><span class="code"> ) </span><span class="code"> { </span> <br/> <br/>	<span class="ciclo"> enquanto </span><span class="code"> 1 </span><span class="code"> &gt;= </span><span class="code"> 1 </span><span class="ciclo"> fazer </span>			<span class="code"> int </span><span class="code" id="divisivel-e"> e </span><span class="code"> = </span><span class="code"> 1 </span><span class="code"> - </span><span class="code"> 17 </span><span class="code"> ; </span> <br/> <br/><span class="ciclo"> end </span> <br/> <br/>		<span class="retornos"> devolve </span><span class="code" id="divisivel-e"> e </span><span class="code"> ; </span> <br/> <br/>		<span class="code"> } </span> <br/> 
-	<span class="code"> int </span><span class="naoUsada" id="None-valor"> valor </span><span class="code"> = </span><span class="code"> 4 </span><span class="code"> ; </span> <br/> <br/>	<span class="def"> def </span><span class="code"> int </span><span class="funcName"> main</span> <span class="code"> ( </span><span class="code"> int </span><span class="code" id="main-a">a </span><span class="code">, </span><span class="code"> int </span><span class="code" id="main-b">b </span><span class="code"> ) </span><span class="code"> { </span> <br/> <br/>		<span class="code"> bool </span><span class="naoUsada" id="main-teste"> teste </span><span class="code"> = </span><span class="funcName" id="main-divisivel"> divisivel </span> <span class="code">(</span><span class="code" id="main-a"> a </span><span class="code"> ) </span><span class="code"> ; </span> <br/> <br/>		<span class="code"> bool </span><span class="naoUsada" id="main-teste2"> teste2 </span><span class="code"> = </span><span class="funcName" id="main-maior"> maior </span> <span class="code">(</span><span class="code" id="main-b"> b </span><span class="code">, </span><span class="code" id="main-a"> a </span><span class="code"> ) </span><span class="code"> ; </span> <br/> <br/>		<span class="code"> } </span> <br/> 
-	<span class="code"> int </span><span class="naoUsada" id="None-final"> final </span><span class="code"> = </span><span class="code"> 10 </span><span class="code"> ; </span> <br/> <br/>
+                <h3 class="code">Instruções de Análise - Seleções</h3>
+                <span class="ciclo juncao">Cor -</span> <span class="code"> Seleção com seleção aninhada de possivel junção </span> <br> 
+ 
+        <br><span class='def'> def </span><span class='code'> int </span><span id='Entry_main' class='funcName'> main</span> <span class='code'> ( </span><span class='code'> ) </span><span class='code'> { </span> <br> <br>	<span class='code'> /* vai ter um ciclo while */ </span> <br>	<span id='do1' class='ciclo'> enquanto </span><span class='naoDeclaracao'> i </span><span class='code'> < </span><span class='code'> 10 </span><span id='do2' class='ciclo'> fazer </span>			<span class='code' id ='main-i'>i </span><span class='code'> 4 </span><span class='code'> + </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br>			<span class='code' id ='main-k'>k </span><span class='code'> \"nao funfa\" </span><span class='code'> ; </span> <br> <br> <br> <br><span id='do2' class='ciclo'> end </span>		<span class='code'> /* vai ter um ciclo for */ </span> <br>		<span id='for1' class='ciclo'> para </span><span class='code'> [ </span><span class='code'> 1 </span><span class='code'>, </span><span class='code'> 10 </span><span class='code'> ] </span><span id='do3' class='ciclo'> fazer </span>				<span class='code' id ='main-para'>para </span><span class='code'> 14 </span><span class='code'> ; </span> <br> <br>				<span class='code' id ='main-a'>a </span><span class='code'> 14 </span><span class='code'> ; </span> <br> <br> <br> <br><span id='do3' class='ciclo'> end </span>			<span class='code'> /* vai ter um ciclo do while */ </span> <br>			<span id='while1' class='ciclo'> repetir </span>				<span class='code' id ='main-i'>i </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br>				<span class='code' id ='main-k'>k </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br><span id='while2' class='ciclo'> ate </span><span class='naoDeclaracao'> i </span><span class='code'> > </span><span class='code'> 0 </span><span id='while2' class='ciclo'> end </span>				<span class='code'> /* vai ter um if else */ </span> <br>				<span id='if1' class='ciclo juncao'> se </span><span class='naoDeclaracao'> i </span><span class='code'> > </span><span class='code'> 0 </span><span class='code'> { </span> <br> <br>					<span class='code'> /* vai ter um if */ </span> <br>					<span id='if2' class='ciclo'> se </span><span class='naoDeclaracao'> i </span><span class='code'> > </span><span class='code'> 0 </span><span class='code'> { </span> <br> <br>						<span class='code' id ='main-i'>i </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br>						<span class='code' id ='main-n'>n </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br>					<span class='code'> } </span> <br> <br>				<span class='code'> } </span> <br> <br>				<span class='code'> /* vai ter um if */ </span> <br>				<span id='if3' class='ciclo'> se </span><span class='naoDeclaracao'> i </span><span class='code'> > </span><span class='code'> 0 </span><span class='code'> { </span> <br> <br>					<span class='code' id ='main-i'>i </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br>					<span class='code' id ='main-n'>n </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br><span class='ciclo'> senao </span><span class='code' id ='main-i'>i </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br><span class='code' id ='main-n'>n </span><span class='code'> 3 </span><span class='code'> - </span><span class='code'> 1 </span><span class='code'> ; </span> <br> <br>				<span class='code'> } </span> <br> <br>				<span class='code'> /* vai ter um caso */ </span> <br>				<span class='code'> } </span> <br> 
+
             </code></pre>
-<h3>Estatisticas</h3>
-<table>
-<tr>
-<th> </th><th> </th>
-</tr>
-<tr><td><span>Variáveis já declaradas:</span></td><td> 0</td></tr>
-<tr><td><span>Variáveis não declaradas:</span></td><td> 0</td></tr>
-<tr><td><span>Variáveis não utilizadas:</span></td><td> 3</td></tr>
-<tr><td><span>Variáveis não inicializadas:</span></td><td> 0</td></tr>
-<tr><td><span>Variáveis do tipo int:</span></td><td> 10</td></tr><tr><td><span>Variáveis do tipo bool:</span></td><td> 2</td></tr><tr><td><span>Total de variaveis:</span></td><td> 12</td></tr><tr><td><span>SE's dentro de SE's:</span></td><td>   0</td></tr><tr><td><span>SE's dentro de REP's:</span></td><td>  0</td></tr><tr><td><span>REP's dentro de SE's:</span></td><td>  0</td></tr><tr><td><span>REP's dentro de REP's:</span></td><td> 1</td></tr>
-</table></div>
-<div class="right-container">
-<h2 class="code">Grafos de fluxo de controlo</h2>
-<div class="image-container w3-card-4">
-<a href="cfgImage.jpg" target="_blank">
-<img alt="Image" draggable="false" onmousedown="startPan(event)" onmousemove="panImage(event)" onmouseout="endPan()" onmouseup="endPan()" src="cfgImage.jpg"/>
-</a>
-</div>
-<h2 class="code">Grafos de dependências de controlo</h2>
-<div class="image-container w3-card-4">
-<a href="sdgImage.jpg" target="_blank">
-<img alt="Image" draggable="false" onmousedown="startPan(event)" onmousemove="panImage(event)" onmouseout="endPan()" onmouseup="endPan()" src="sdgImage.jpg"/>
-</a>
-</div>
-</div>
-</div></body>
-</html>
+            <h3>Estatisticas</h3>
+            <table>
+            <tr>
+                <th>  </th><th>  </th>
+                </tr>
+                <tr><td><span>Variáveis já declaradas:</td><td> 0</span></td></tr>
+                <tr><td><span>Variáveis não declaradas:</td><td> 17</span></td></tr>
+                <tr><td><span>Variáveis não utilizadas:</td><td> 0</span></td></tr>
+                <tr><td><span>Variáveis não inicializadas:</td><td> 0</span></td></tr>
+                
+        <tr><td><span>Total de variaveis:</td><td> 0</span></td></tr><tr><td><span>SE's dentro de SE's:</td><td>   1</span></td></tr><tr><td><span>SE's dentro de REP's:</td><td>  5</span></td></tr><tr><td><span>REP's dentro de SE's:</td><td>  0</span></td></tr><tr><td><span>REP's dentro de REP's:</td><td> 5</span></td></tr>
+        </div>
+        <div class="right-container">
+        <h2 class="code">Grafos de fluxo de controlo</h2>
+        <div class="image-container w3-card-4">
+        <a href="cfgImage.jpg" target="_blank">
+            <img src="cfgImage.jpg" alt="Image" onmousedown="startPan(event)" onmouseup="endPan()" onmousemove="panImage(event)" onmouseout="endPan()" draggable="false">
+        </a>
+        </div>
+        <h2 class="code">Grafos de dependências de controlo</h2>
+        <div class="image-container w3-card-4">
+        <a href="sdgImage.jpg" target="_blank">
+            <img src="sdgImage.jpg" alt="Image" onmousedown="startPan(event)" onmouseup="endPan()" onmousemove="panImage(event)" onmouseout="endPan()" draggable="false">
+        </a>
+        
+        </div>
+        </div>
+        </body>
+        </html>
+        

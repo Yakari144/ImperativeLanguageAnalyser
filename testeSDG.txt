@@ -22,13 +22,16 @@ def int main ( ) {
     ate i > 0
     end
 
-    /* vai ter um if */
+    /* vai ter um if else */
     se i > 0{
-        i = 3 - 1;
-        n = 3 - 1;
+        /* vai ter um if */
+        se i > 0{
+            i = 3 - 1;
+            n = 3 - 1;
+        }
     }
 
-    /* vai ter um if else */
+    /* vai ter um if */
     se i > 0{
         i = 3 - 1;
         n = 3 - 1;
@@ -40,4 +43,6 @@ def int main ( ) {
 
     /* vai ter um caso */
 
+
+    
 }

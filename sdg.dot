@@ -1,21 +1,29 @@
 digraph G {
-"Entry_maior" -> "2:  int maior  ;  "
-"Entry_maior" -> "3: se num1  >= num2   "
-"3: ENTAO" [label="ENTAO"]
-"3: se num1  >= num2   " -> "3: ENTAO"
-"3: ENTAO" -> "4: maior =  num1     ;  "
-"4: SENAO" [label="SENAO"]
-"3: se num1  >= num2   " -> "4: SENAO"
-"4: SENAO" -> "5: maior =  num2     ;  "
-"Entry_maior" -> "5: devolve maior  ; "
-"Entry_divisivel" -> "7: enquanto 1  >= 1   "
-"7: enquanto 1  >= 1   " -> "8:  int e = 1 - 17    ;  "
-"7: enquanto 1  >= 1   " -> "9:  tuplo eg = ( e ,  g )    ;  "
-"Entry_divisivel" -> "9: devolve e  ; "
-Entry_GLOBAL -> "11:  int valor = 4    ;  "
-"Entry_main" -> "Entry_divisivel"
-"Entry_main" -> "12:  bool teste = divisivel( a   )     ;  "
-"Entry_main" -> "Entry_maior"
-"Entry_main" -> "13:  bool teste2 = maior( b   ,  a   )     ;  "
-Entry_GLOBAL -> "14:  int final = 10    ;  "
+"Entry_main" -> "1: enquanto i  < 10   "
+"1: enquanto i  < 10   " -> "2: i =  4 + 1     ;  "
+"1: enquanto i  < 10   " -> "3: k =  \"nao funfa\"     ;  "
+"Entry_main" -> "4: para [ 1 10 ] "
+"4: para [ 1 10 ] " -> "5: para =  14     ;  "
+"4: para [ 1 10 ] " -> "6: a =  14     ;  "
+"Entry_main" -> "7"
+"7" -> "8: i =  3 - 1     ;  "
+"7" -> "9: k =  3 - 1     ;  "
+"7" [label="7: repetir ... ate i  > 0  "]
+"Entry_main" -> "10: se i  > 0   "
+"10: ENTAO" [label="ENTAO"]
+"10: se i  > 0   " -> "10: ENTAO"
+"10: ENTAO" -> "11: se i  > 0   "
+"11: ENTAO" [label="ENTAO"]
+"11: se i  > 0   " -> "11: ENTAO"
+"11: ENTAO" -> "12: i =  3 - 1     ;  "
+"11: ENTAO" -> "13: n =  3 - 1     ;  "
+"Entry_main" -> "14: se i  > 0   "
+"14: ENTAO" [label="ENTAO"]
+"14: se i  > 0   " -> "14: ENTAO"
+"14: ENTAO" -> "15: i =  3 - 1     ;  "
+"14: ENTAO" -> "16: n =  3 - 1     ;  "
+"16: SENAO" [label="SENAO"]
+"14: se i  > 0   " -> "16: SENAO"
+"16: SENAO" -> "17: i =  3 - 1     ;  "
+"16: SENAO" -> "18: n =  3 - 1     ;  "
 }

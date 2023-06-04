@@ -22,7 +22,8 @@ def bool divisivel (int a) {
         tuplo eg = (e,g); 
     end
 
-    devolve e;
+    bool teste2 = maior(b, a);
+    devolve teste2;
 }
 
 int valor = 4;
@@ -31,7 +32,6 @@ int valor = 4;
 def int main(int a, int b) {
 
     bool teste = divisivel(a);
-    bool teste2 = maior(b, a);
 
 }
 

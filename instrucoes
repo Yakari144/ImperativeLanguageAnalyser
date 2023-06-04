@@ -1,16 +1,8 @@
-1:  int final2 = 3    ;  
- def  int  maior(  int num1  ,  int num2   ) {
-2:  int maior  ;  
-5: SAIR_SE
-5: devolve maior  ; 
+ def  int  main( ) {
+1: enquanto i  < 10   
+4: para [ 1 10 ] 
+9: ATE i  > 0  
+13: SAIR_SE
+18: SAIR_SE
 }
-  def  bool  divisivel(  int a   ) {
-7: enquanto 1  >= 1   
-9: devolve e  ; 
-}
- 11:  int valor = 4    ;  
- def  int  main(  int a  ,  int b   ) {
-12:  bool teste = divisivel( a   )     ;  
-13:  bool teste2 = maior( b   ,  a   )     ;  
-}
- 14:  int final = 10    ;  
+ 

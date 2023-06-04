@@ -345,6 +345,18 @@ class MyInterpreter(Interpreter):
                 display: inline-block;
                 color: #CB692B;
             }
+
+            .ciclo.juncao {
+                position: relative;
+                display: inline-block;
+                color: #ff9900;
+            }
+
+            .funcao.inalcancavel {
+                position: relative;
+                display: inline-block;
+                color: #00ff00;
+            }
             
             .retornos {
                 position: relative;
@@ -482,6 +494,8 @@ class MyInterpreter(Interpreter):
                 <span class="naoDeclaracao">Cor -</span> <span class="code"> Não-Declaração </span> <br> \n
                 <span class="naoInicializada">Cor -</span> <span class="code"> Não-Inicializada </span> <br> \n
                 <span class="naoUsada">Cor -</span> <span class="code"> Não-Utilizada </span> <br> \n 
+                <h3 class="code">Instruções de Análise - Seleções</h3>
+                <span class="ciclo juncao">Cor -</span> <span class="code"> Seleção com seleção aninhada de possivel junção </span> <br> \n 
         '''
 
     def htmlEnd(self):
@@ -543,37 +557,71 @@ class MyInterpreter(Interpreter):
         return r
     
     def complexidadeMcCabes(self):
-        file_path = "sdg.dot"  # Replace with your file path
-        file = open(file_path, "r")
-        lines = file.readlines()
-        file.close()
+        #file_path = "sdg.dot"  # Replace with your file path
+        #file = open(file_path, "r")
+        #lines = file.readlines()
+        #file.close()
+        lines = self.sdg.split("\n")
         del lines[0]       # Delete the first element
         del lines[-1] 
         
         funcoes = {}
         for line in lines:
             if "Entry" in line:
-                if line.split("->")[0] not in funcoes.keys():
-                    funcoes[line.split("->")[0]] = {}
-        
+                ls = line.split("->")
+                if "Entry" in ls[0]:
+                    if ls[0] not in funcoes.keys():
+                        key = re.sub(" ", "", ls[0])
+                        funcoes[key] = {}
+                if "Entry" in ls[1]:
+                    if ls[1] not in funcoes.keys():
+                        key = re.sub("\n", " ", ls[1])
+                        key = re.sub(" ", "", key)
+                        funcoes[key] = {}
+                    
         antigo = ""
         for line in lines:
-            if(line.split("->")[0] and line.split("->")[1] in funcoes.keys()):
-                pass
-            elif line.split("->")[0] in funcoes.keys():
-                if "arestas" not in funcoes[line.split("->")[0]].keys():
-                    funcoes[line.split("->")[0]]["arestas"] = 1
-                else:
-                    funcoes[line.split("->")[0]]["arestas"] += 1
-                antigo = line.split("->")[0]
-            else :
-                if "arestas" not in funcoes[antigo].keys():
-                    funcoes[antigo]["arestas"] = 1
-                else:
-                    funcoes[antigo]["arestas"] += 1
-                    
-        print("Diccionario de funcoes: " + str(funcoes))
-            
+            if '->' in line:
+                ls = line.split("->")
+                key1 = re.sub(" ", "", ls[0])
+                key2 = re.sub("\n", " ", ls[1])
+                key2 = re.sub(" ", "", key2)
+                if key1 in funcoes.keys():
+                    if "arestas" not in funcoes[key1].keys():
+                        funcoes[key1]["arestas"] = 1
+                    else:
+                        funcoes[key1]["arestas"] += 1
+                    if "nodos" not in funcoes[key1].keys():
+                        funcoes[key1]["nodos"] = [key2]
+                    else:
+                        if key2 not in funcoes[key1]["nodos"]:
+                            funcoes[key1]["nodos"].append(key2)
+
+                    antigo = key1
+                elif key1 and key2 not in funcoes.keys():
+                    if "nodos" not in funcoes[antigo].keys():
+                        funcoes[antigo]["nodos"] = [key1, key2]
+                        funcoes[antigo]["arestas"] += 1
+                    else:
+                        if key1 not in funcoes[antigo]["nodos"]:
+                            funcoes[antigo]["nodos"].append(key1)
+                        if key2 not in funcoes[antigo]["nodos"]:
+                            funcoes[antigo]["nodos"].append(key2)
+                        funcoes[antigo]["arestas"] += 1
+
+                else :
+                    if "arestas" not in funcoes[antigo].keys():
+                        funcoes[antigo]["arestas"] = 1
+                    else:
+                        funcoes[antigo]["arestas"] += 1
+
+        
+        for key in funcoes.keys():
+            print("Funcao: " + key)
+            print("\tNodos: " + str(funcoes[key]["nodos"]))
+            print("\tArestas: " + str(funcoes[key]["arestas"]))
+            print("\tComplexidade de McCabe: " + str(funcoes[key]["arestas"] - len(funcoes[key]["nodos"]) + 2))
+
 #####################################################
 ################ Interpreter methods ################
 #####################################################
@@ -744,7 +792,7 @@ class MyInterpreter(Interpreter):
                 if (elemento.type == 'ID'):
                     self.pushFunc(t)
                     self.sdgFunc.append("Entry_"+t)
-                    self.HTML += "<span class='funcName'> " + t + "</span> <span class='code'> ( </span>"
+                    self.HTML += "<span id='Entry_"+t+"' class='funcName'> " + t + "</span> <span class='code'> ( </span>"
                     retorno += " "+ t + "(" + " "
                     self.cfgAnt = "Entry_"+t
                 elif (elemento.type == 'DEF'):
@@ -1067,6 +1115,8 @@ class MyInterpreter(Interpreter):
                     self.sdgFunc.append(entao)
                     # instrucao else no CFG
                     self.cfg+= '"'+inicioIF + '" -> "'+entao +'"\n'
+                    # atualiza a cfgAnt
+                    self.cfgAnt = entao
                     # instrucao else no SDG
                     self.sdg+= '"'+inicioIF+'" -> "'+entao+'"\n'
                     # colocar o if em diamante
@@ -1078,8 +1128,6 @@ class MyInterpreter(Interpreter):
                     senao = str(self.instC)+": SENAO"
                     # atribuir txt a instrucao then
                     self.sdg += '"'+senao+'" [label="SENAO"]\n'
-                    # instrucao else no CFG
-                    self.cfg+= '"'+inicioIF + '" -> "'+senao +'"\n'
                     # instrucao else no SDG
                     self.sdg+= '"'+inicioIF+'" -> "'+senao+'"\n'
                     # pop do then no SDG
@@ -1087,7 +1135,7 @@ class MyInterpreter(Interpreter):
                     # update func para else
                     self.sdgFunc.append(senao)
                     # guarda inicio do else no CFG
-                    ant = senao
+                    ant = self.cfgAnt
                     self.cfgAnt = inicioIF
                     # trata do corpo do else
                     self.visit(elemento)
@@ -1110,11 +1158,11 @@ class MyInterpreter(Interpreter):
                 elif (elemento.type=='SE'):
                     self.pushEc("if")
                     se = True
-                    self.HTML += "<span class='ciclo'> "+t+" </span>"
+                    self.HTML += "<span id='"+self.ecAct()+"' class='ciclo'> "+t+" </span>"
                 
                 elif (elemento.type=='CASO'):
                     self.pushEc("case")
-                    self.HTML += "<span class='ciclo'> "+t+" </span>"
+                    self.HTML += "<span id='"+self.ecAct()+"' class='ciclo'> "+t+" </span>"
                     
                 elif (elemento.type=='END'):
                     self.HTML +=self.getTab()[:-1]+ "<span class='ciclo'> "+t+" </span> <br> <br>"
@@ -1143,12 +1191,15 @@ class MyInterpreter(Interpreter):
         elif len(tree.children) == 3+c:
             v = self.getEcVal(self.eC , self.ecStack)
             if type(v)==dict and len(v.keys())==1 and 'if' in list(v.keys())[0]:
-                        print("Selecao "+ self.ecAct()+" é IF com IF aninhado e de possivel junção.")
+                print("Selecao "+ self.ecAct()+" é IF com IF aninhado e de possivel junção.")
+                self.HTML = self.HTML.replace("id='"+self.ecAct()+"' class='ciclo'", "id='"+self.ecAct()+"' class='ciclo juncao'")
+            else:
+                print(v)
         self.popEc()
         return retorno
 
     def senao(self,tree):
-        newIt = str(self.instC)+": SENAO "
+        newIt = str(self.instC)+": SENAO"
         self.cfg+= '"'+self.cfgAnt + '" -> "' + newIt + '"\n'
         self.cfgAnt = newIt
         for elemento in tree.children:
@@ -1186,26 +1237,26 @@ class MyInterpreter(Interpreter):
                         self.sdgFunc.append(self.cfgAnt)
                         enquanto = False
                     if(ate):
-                        print(inicioDoWhile)
+                        #print(inicioDoWhile)
                         retorno = self.visit(elemento)
-                        print(retorno)
-                        self.cfg += '"'+ re.sub("\n", "", inicioDoWhile) + '" -> "' + str(self.instC) + ': ATE ' + retorno + '"\n'
-                        self.cfg += '"'+ str(self.instC) + ": ATE " + re.sub("\n", "", retorno) + '" -> "' + re.sub("\n", "", inicioDoWhile) + '"\n'
-                        self.cfg += '"'+ str(self.instC) + ": ATE " + re.sub("\n", "", retorno) + '" [shape=diamond]\n'
-                        self.cfgAnt = str(self.instC) + ": ATE "  + retorno
+                        #print(retorno)
+                        n = str(self.instC)+": ATE " + re.sub("\n", "", retorno)
+                        self.cfg += '"'+ self.cfgAnt + '" -> "' + n + '"\n'
+                        self.cfg += '"'+ n + '" -> "' + re.sub("\n", "", inicioDoWhile) + '"\n'
+                        self.cfg += '"'+ n + '" [shape=diamond]\n'
+                        self.cfgAnt = n
                         # id [label="Texto"]
                         self.sdg += self.getSDGFunc()+' [label="'+self.getSDGFunc().split('"')[1]+': repetir ... ate '+re.sub("\n", "", retorno)+'"]\n'
                         ate = False
                         endAte = True
                 elif(elemento.data == 'componente'):
-                    if(fazer):
-                        self.visit(elemento)
                     if(repetir):
-                        anterior = self.cfgAnt
-                        retorno  = self.visit(elemento)
-                        #self.cfg += '"'+ anterior + '" -> "' + re.sub("\n", "", retorno) + '"\n' # esta linha está a escrever em dplicado em algum sitio
+                        retorno  = re.sub('\n','',self.visit(elemento))
                         inicioDoWhile = retorno
                         self.cfgAnt = retorno
+                        repetir = False
+                    else:
+                        self.visit(elemento)
                 elif (elemento.data == 'interv'):
                     if(para):
                         retorno += self.visit(elemento) + " "
@@ -1218,13 +1269,12 @@ class MyInterpreter(Interpreter):
             else:
                 id = elemento.value
                 retorno += id + " "
-                self.HTML += "<span class='ciclo'> "+id+" </span>"
                 if (elemento.type=='ENQ'):
                     enquanto = True
                     self.pushEc("do")
                 elif (elemento.type == 'REPETIR'):
                     repI = str(self.instC)
-                    self.sdg += self.getSDGFunc()+' -> '+repI+'\n'
+                    self.sdg += self.getSDGFunc()+' -> "'+repI+'"\n'
                     self.sdgFunc.append(repI)
                     repetir = True
                     self.pushEc("while")
@@ -1244,6 +1294,7 @@ class MyInterpreter(Interpreter):
                         self.cfg += '"'+self.cfgAnt + '" -> "' + inicioCiclo + '"\n'
                         self.cfgAnt = inicioCiclo
                         self.HTML += " <br> <br>"
+                self.HTML += "<span id='"+self.ecAct()+"' class='ciclo'> "+id+" </span>"
         self.popEc()
         self.sdgFunc.pop()
         return retorno
@@ -1420,8 +1471,8 @@ class MyInterpreter(Interpreter):
                     self.HTML += "<span class='code'> false </span>"
         return retorno
         
-#f = open('testeSDG.txt', 'r')
-f = open('linguagem2.txt', 'r')
+f = open('testeSDG.txt', 'r')
+#f = open('linguagem2.txt', 'r')
 frase = f.read()
 f.close()
 
