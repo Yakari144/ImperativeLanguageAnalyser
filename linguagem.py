@@ -649,6 +649,8 @@ class MyInterpreter(Interpreter):
         # remove duplicates from the list
         n = list(dict.fromkeys(nodos))
         notDireita = [x for x in n if x not in direita]
+        if "Entry_GLOBAL" in notDireita:
+            notDireita.remove("Entry_GLOBAL")
         if len(notDireita) > 0:
             self.HTML += "<span> Grafos de Ilha:</span> <br>"
             self.HTML += "<ul>"
