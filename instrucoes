@@ -1,8 +1,0 @@
- def  int  main( ) {
-1: enquanto i  < 10   
-4: para [ 1 10 ] 
-9: ATE i  > 0  
-15: SAIR_SE
-21: SAIR_SE
-}
- 

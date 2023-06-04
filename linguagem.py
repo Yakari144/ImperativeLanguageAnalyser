@@ -758,8 +758,6 @@ class MyInterpreter(Interpreter):
         for elemento in tree.children:
             if (type(elemento)==Tree):
                 retorno += self.visit(elemento)
-        with open("instrucoes", "w") as f:
-            f.write(retorno)
     
     def componente(self, tree):
         retorno =""
