@@ -350,12 +350,14 @@ class MyInterpreter(Interpreter):
                 position: relative;
                 display: inline-block;
                 color: #ff9900;
+                border-bottom: 2px dotted black;
             }
 
-            .funcao.inalcancavel {
+            .ilhas {
                 position: relative;
                 display: inline-block;
                 color: #00ff00;
+                border-bottom: 2px dotted black;
             }
             
             .retornos {
@@ -431,6 +433,7 @@ class MyInterpreter(Interpreter):
             
             .container {
                 display: flex;
+                overflow-x: auto;
             }
 
             .left-container,
@@ -496,6 +499,8 @@ class MyInterpreter(Interpreter):
                 <span class="naoUsada">Cor -</span> <span class="code"> Não-Utilizada </span> <br> \n 
                 <h3 class="code">Instruções de Análise - Seleções</h3>
                 <span class="ciclo juncao">Cor -</span> <span class="code"> Seleção com seleção aninhada de possivel junção </span> <br> \n 
+                <h3 class="code">Instruções de Análise - Outros</h3>
+                <span class="ilhas">Cor -</span> <span class="code"> Inicio de código inalcansável </span> <br> \n 
         '''
 
     def htmlEnd(self):
@@ -529,7 +534,14 @@ class MyInterpreter(Interpreter):
         for var in varsUnnused:
             for x in soup.find_all('span', id=var):
                 x['class'] = 'naoUsada'
-            self.HTML = str(soup)
+        
+        # in every class "naoDeclarada" add title "Variável não declarada"
+        xs = ['redeclaracao','naoDeclaracao','naoInicializada','naoUsada','ciclo juncao','ilhas']
+        ys = ['Redeclaração','Não-Declaração','Não-Inicializada','Não-Utilizada','Seleção com seleção aninhada de possivel junção','Inicio de código inalcansável']
+        for i in range(0,len(xs)):
+            for y in soup.find_all(class_=xs[i]):
+                y['title'] = ys[i]
+        self.HTML = str(soup)
 
     def geraGrafos(self):
         os.system("dot -Tpng -o cfgImage.jpg cfg.dot")
@@ -564,28 +576,37 @@ class MyInterpreter(Interpreter):
         lines = self.sdg.split("\n")
         del lines[0]       # Delete the first element
         del lines[-1] 
-        
+        direita = []
+        nodos = []
+
         funcoes = {}
         for line in lines:
             if "Entry" in line:
                 ls = line.split("->")
-                if "Entry" in ls[0]:
-                    if ls[0] not in funcoes.keys():
-                        key = re.sub(" ", "", ls[0])
-                        funcoes[key] = {}
-                if "Entry" in ls[1]:
-                    if ls[1] not in funcoes.keys():
-                        key = re.sub("\n", " ", ls[1])
-                        key = re.sub(" ", "", key)
-                        funcoes[key] = {}
-                    
+                for i in range(0, len(ls)):
+                    ls[i] = ls[i].strip().replace("\n", "")
+                if ls[1] not in direita:
+                    direita.append(ls[1])
+                nodos.append(ls[0])
+                nodos.append(ls[1])
+                for i in range(0, len(ls)):
+                    if "Entry" in ls[i]:
+                        if ls[i] not in funcoes.keys():
+                            key = ls[i].strip().replace("\n", "")
+                            funcoes[key] = {}
+               
         antigo = ""
         for line in lines:
             if '->' in line:
                 ls = line.split("->")
-                key1 = re.sub(" ", "", ls[0])
-                key2 = re.sub("\n", " ", ls[1])
-                key2 = re.sub(" ", "", key2)
+                for i in range(0, len(ls)):
+                    ls[i] = ls[i].strip().replace("\n", "")
+                if ls[1] not in direita:
+                    direita.append(ls[1])
+                nodos.append(ls[0])
+                nodos.append(ls[1])
+                key1 = ls[0]
+                key2 = ls[1]
                 if key1 in funcoes.keys():
                     if "arestas" not in funcoes[key1].keys():
                         funcoes[key1]["arestas"] = 1
@@ -608,19 +629,42 @@ class MyInterpreter(Interpreter):
                         if key2 not in funcoes[antigo]["nodos"]:
                             funcoes[antigo]["nodos"].append(key2)
                         funcoes[antigo]["arestas"] += 1
-
                 else :
                     if "arestas" not in funcoes[antigo].keys():
                         funcoes[antigo]["arestas"] = 1
                     else:
-                        funcoes[antigo]["arestas"] += 1
-
-        
+                        funcoes[antigo]["arestas"] += 1 
+        self.HTML += "</div><div><h3>Complexidade de McCabe</h3>"
         for key in funcoes.keys():
+            self.HTML += "<span> Função " + key + "</span> <br>"
+            self.HTML += f'''<pre>
+                    \tNodos: {len(funcoes[key]["nodos"])}
+                    \tArestas: {funcoes[key]["arestas"]}
+                    \tComplexidade de McCabe: {funcoes[key]["arestas"] - len(funcoes[key]["nodos"]) + 2}
+                </pre>'''
             print("Funcao: " + key)
             print("\tNodos: " + str(funcoes[key]["nodos"]))
             print("\tArestas: " + str(funcoes[key]["arestas"]))
-            print("\tComplexidade de McCabe: " + str(funcoes[key]["arestas"] - len(funcoes[key]["nodos"]) + 2))
+            print("\tComplexidade de McCabe: " + str((funcoes[key]["arestas"]) - len(funcoes[key]["nodos"]) + 2))
+        # remove duplicates from the list
+        n = list(dict.fromkeys(nodos))
+        notDireita = [x for x in n if x not in direita]
+        if len(notDireita) > 0:
+            self.HTML += "<span> Grafos de Ilha:</span> <br>"
+            self.HTML += "<ul>"
+            for x in notDireita:
+                self.HTML += "<li>" + x + "</li>"
+                # in self.HTML where id=x add the class "ilhas"
+                soup = BeautifulSoup(self.HTML, 'html.parser')
+                x = x.replace("\"", "").replace(" ", "").strip()
+                for y in soup.find_all('span', id=x):
+                    y['class'].append('ilhas')
+            self.HTML = str(soup)
+
+
+            self.HTML += "</ul>"
+        else:
+            self.HTML += "<span> Não existem grafos de ilha </span> <br>"
 
 #####################################################
 ################ Interpreter methods ################
@@ -663,7 +707,6 @@ class MyInterpreter(Interpreter):
         with open("sdg.dot", "w") as f:
             f.write(self.sdg)
             f.close()
-        self.complexidadeMcCabes()
         self.HTML +=f"""
             </code></pre>
             <h3>Estatisticas</h3>
@@ -697,6 +740,7 @@ class MyInterpreter(Interpreter):
         print("Total de variáveis: " + str(t))
         self.countEc()
         self.geraGrafos()
+        self.complexidadeMcCabes()
         self.htmlEnd()
         self.updateHTML()
         
@@ -802,12 +846,12 @@ class MyInterpreter(Interpreter):
             if not var['usada']:
 #                print("Variavel "+var['nome']+" na funcao "+self.funcAct()+" nao usada (3)")
                 self.vars[2].append(str(self.funcAct()) +"-"+var['nome'])
-        self.HTML += self.getTab() + "<span class='code'> } </span> <br> \n"
         if self.cfgAnt != "":
             self.cfg += '"'+ self.cfgAnt + "\" -> " + "Exit_"+self.funcAct() + "\n"
         self.cfgAnt = ant
         self.popFunc()
         self.sdgFunc.pop()
+        self.HTML += self.getTab() + "<span class='code'> } </span> <br> \n"
         return retorno
  
     def funcao(self,tree):
@@ -1005,22 +1049,27 @@ class MyInterpreter(Interpreter):
                 if (elemento.type == 'ID'):
                     id = elemento.value
                     retorno += id + " = " + " "
-                    self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
-        if id not in [x['nome'] for x in self.variaveis['GLOBAL']]:
-            if self.inFuncao():
-                if self.funcAct() not in self.variaveis.keys():
-#                    print("Variavel "+id+" não declarada (2)")
-                    self.vars[1].append(str(self.funcAct()) +"-"+id)
-                elif id not in [x['nome'] for x in self.variaveis[self.funcAct()]]:
-#                    print("Variavel "+id+" não declarada (2)")
-                    self.vars[1].append(str(self.funcAct()) +"-"+id)
-                else:
-                    self.setVar(id,'atribuicao',True)
-            else:
-#                print("Variavel "+id+" não declarada (2)")
-                self.vars[1].append(str(self.funcAct()) +"-"+id)
-        else:
-            self.setVar(id,'atribuicao',True)
+                    decl = True
+                    if id not in [x['nome'] for x in self.variaveis['GLOBAL']]:
+                        if self.inFuncao():
+                            if self.funcAct() not in self.variaveis.keys() or id not in [x['nome'] for x in self.variaveis[self.funcAct()]]:
+#                                print("Variavel "+id+" não declarada (2)")
+                                self.vars[1].append(str(self.funcAct()) +"-"+id)
+                                decl=False
+                            else:
+                                self.setVar(id,'atribuicao',True)
+                        else:
+#                            print("Variavel "+id+" não declarada (2)")
+                            self.vars[1].append(str(self.funcAct()) +"-"+id)
+                    else:
+                        self.setVar(id,'atribuicao',True)
+                    if not decl:
+                        self.HTML += "<span class='naoDeclaracao' id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
+                    else:
+                        self.HTML += "<span class='code' id ='"+str(self.funcAct()) + "-" + id +"'>" + id + " </span>"
+                    self.HTML += "<span class='code'>=</span>"
+                    
+
         return retorno
 
     def leitura(self,tree):
@@ -1176,6 +1225,8 @@ class MyInterpreter(Interpreter):
             self.sdgFunc.pop()
             # pop do if no SDG
             self.sdgFunc.pop()
+            # instrucao de saida do if
+            self.instC += 1
             ex = str(self.instC)+": SAIR_SE"
             self.cfg+= '"'+self.cfgAnt + '" -> "' + ex + '"\n'
             if senao:
@@ -1199,16 +1250,20 @@ class MyInterpreter(Interpreter):
         return retorno
 
     def senao(self,tree):
+        self.HTML += self.getTab()[-1]
+        self.HTML += "<span class='code'> }</span>"
         newIt = str(self.instC)+": SENAO"
         self.cfg+= '"'+self.cfgAnt + '" -> "' + newIt + '"\n'
         self.cfgAnt = newIt
         for elemento in tree.children:
             if (type(elemento)==Tree):
+                self.HTML += self.getTab()
                 self.visit(elemento)
             else:
                 t = elemento.value
                 if (elemento.type=='SENAO'):
                     self.HTML += "<span class='ciclo'> "+t+" </span>"
+                    self.HTML += "<span class='code'> { </span> <br> <br>"
                 elif (elemento.type == 'COMENTARIO'):
                     c +=1
                     comentario = elemento.value
@@ -1269,8 +1324,10 @@ class MyInterpreter(Interpreter):
             else:
                 id = elemento.value
                 retorno += id + " "
+                eA = False
                 if (elemento.type=='ENQ'):
                     enquanto = True
+                    eA = True
                     self.pushEc("do")
                 elif (elemento.type == 'REPETIR'):
                     repI = str(self.instC)
@@ -1280,21 +1337,25 @@ class MyInterpreter(Interpreter):
                     self.pushEc("while")
                 elif (elemento.type == 'PARA'):
                     para = True
+                    eA = True
                     self.pushEc("for")
                 elif (elemento.type == 'FAZER'):
                     fazer = True
-                    self.pushEc("do")
                 elif (elemento.type == 'ATE'):
                     ate = True
-                    self.pushEc("while")
+                    eA = True
+                    self.HTML += self.getTab()[:-1]
                 elif (elemento.type=='END'):
                     if(endAte):
                         endAte = False
                     else:
                         self.cfg += '"'+self.cfgAnt + '" -> "' + inicioCiclo + '"\n'
                         self.cfgAnt = inicioCiclo
-                        self.HTML += " <br> <br>"
+                        self.HTML += self.getTab()[:-1]
+
                 self.HTML += "<span id='"+self.ecAct()+"' class='ciclo'> "+id+" </span>"
+                if not eA:
+                    self.HTML += "<br> <br>"
         self.popEc()
         self.sdgFunc.pop()
         return retorno

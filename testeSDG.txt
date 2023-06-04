@@ -40,9 +40,5 @@ def int main ( ) {
         i = 3 - 1;
         n = 3 - 1;
     }
-
-    /* vai ter um caso */
-
-
     
 }

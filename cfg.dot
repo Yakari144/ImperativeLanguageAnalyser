@@ -22,19 +22,19 @@ digraph G {
 "11: se i  > 0   " [shape=diamond]
 "11: ENTAO" -> "12: i =  3 - 1     ;  "
 "12: i =  3 - 1     ;  " -> "13: n =  3 - 1     ;  "
-"13: n =  3 - 1     ;  " -> "13: SAIR_SE"
-"11: se i  > 0   " -> "13: SAIR_SE"
-"13: SAIR_SE" -> "13: SAIR_SE"
-"10: se i  > 0   " -> "13: SAIR_SE"
-"13: SAIR_SE" -> "14: se i  > 0   "
-"14: se i  > 0   " -> "14: ENTAO"
-"14: se i  > 0   " [shape=diamond]
-"14: ENTAO" -> "15: i =  3 - 1     ;  "
-"15: i =  3 - 1     ;  " -> "16: n =  3 - 1     ;  "
-"14: se i  > 0   " -> "16: SENAO"
-"16: SENAO" -> "17: i =  3 - 1     ;  "
+"13: n =  3 - 1     ;  " -> "14: SAIR_SE"
+"11: se i  > 0   " -> "14: SAIR_SE"
+"14: SAIR_SE" -> "15: SAIR_SE"
+"10: se i  > 0   " -> "15: SAIR_SE"
+"15: SAIR_SE" -> "16: se i  > 0   "
+"16: se i  > 0   " -> "16: ENTAO"
+"16: se i  > 0   " [shape=diamond]
+"16: ENTAO" -> "17: i =  3 - 1     ;  "
 "17: i =  3 - 1     ;  " -> "18: n =  3 - 1     ;  "
-"18: n =  3 - 1     ;  " -> "18: SAIR_SE"
-"16: n =  3 - 1     ;  " -> "18: SAIR_SE"
-"18: SAIR_SE" -> Exit_main
+"16: se i  > 0   " -> "18: SENAO"
+"18: SENAO" -> "19: i =  3 - 1     ;  "
+"19: i =  3 - 1     ;  " -> "20: n =  3 - 1     ;  "
+"20: n =  3 - 1     ;  " -> "21: SAIR_SE"
+"18: n =  3 - 1     ;  " -> "21: SAIR_SE"
+"21: SAIR_SE" -> Exit_main
 }

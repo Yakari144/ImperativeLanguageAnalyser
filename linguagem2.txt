@@ -6,9 +6,11 @@ int final2 = 3;
 def  int  maior (  int num1, int num2 )  {  
     int maior;
     se num1 >= num2 {
+        a = 3;
        maior = num1;
     }
     senao {
+        a = 2;
        maior = num2;
     } 
     devolve maior;
@@ -22,8 +24,16 @@ def bool divisivel (int a) {
         tuplo eg = (e,g); 
     end
 
-    bool teste2 = maior(b, a);
-    devolve teste2;
+    
+    devolve eg;
+}
+
+def int complexo(int a){
+
+    enquanto !a
+    fazer 
+        int e = 2;
+    end
 }
 
 int valor = 4;
@@ -31,9 +41,13 @@ int valor = 4;
 
 def int main(int a, int b) {
 
-    bool teste = divisivel(a);
-
+    bool teste = 4;
 }
+
+divisivel(4);
+
+main(3,4);
+
 
 
 int final = 10;

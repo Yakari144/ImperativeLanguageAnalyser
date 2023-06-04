@@ -17,13 +17,13 @@ digraph G {
 "11: se i  > 0   " -> "11: ENTAO"
 "11: ENTAO" -> "12: i =  3 - 1     ;  "
 "11: ENTAO" -> "13: n =  3 - 1     ;  "
-"Entry_main" -> "14: se i  > 0   "
-"14: ENTAO" [label="ENTAO"]
-"14: se i  > 0   " -> "14: ENTAO"
-"14: ENTAO" -> "15: i =  3 - 1     ;  "
-"14: ENTAO" -> "16: n =  3 - 1     ;  "
-"16: SENAO" [label="SENAO"]
-"14: se i  > 0   " -> "16: SENAO"
-"16: SENAO" -> "17: i =  3 - 1     ;  "
-"16: SENAO" -> "18: n =  3 - 1     ;  "
+"Entry_main" -> "16: se i  > 0   "
+"16: ENTAO" [label="ENTAO"]
+"16: se i  > 0   " -> "16: ENTAO"
+"16: ENTAO" -> "17: i =  3 - 1     ;  "
+"16: ENTAO" -> "18: n =  3 - 1     ;  "
+"18: SENAO" [label="SENAO"]
+"16: se i  > 0   " -> "18: SENAO"
+"18: SENAO" -> "19: i =  3 - 1     ;  "
+"18: SENAO" -> "20: n =  3 - 1     ;  "
 }
